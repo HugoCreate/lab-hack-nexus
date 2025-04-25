@@ -1,12 +1,9 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Terminal, Shield, ChevronRight } from 'lucide-react';
-
 const HeroSection = () => {
-  return (
-    <div className="relative overflow-hidden bg-cyber-black py-16 md:py-24 cyber-grid">
+  return <div className="relative overflow-hidden bg-cyber-black py-16 md:py-24 cyber-grid">
       {/* Glow Effects */}
       <div className="absolute top-1/2 left-20 w-60 h-60 bg-cyber-purple/20 rounded-full blur-3xl" />
       <div className="absolute bottom-20 right-20 w-80 h-80 bg-cyber-blue/10 rounded-full blur-3xl" />
@@ -25,9 +22,7 @@ const HeroSection = () => {
               </span>
             </h1>
             
-            <p className="text-lg md:text-xl text-muted-foreground max-w-lg">
-              Uma comunidade para aspirantes e profissionais compartilharem conhecimento sobre hacking ético e cibersegurança.
-            </p>
+            <p className="text-lg md:text-xl text-muted-foreground max-w-lg">Uma comunidade para aspirantes e profissionais compartilharem conhecimento sobre hacking ético e cibersegurança.</p>
             
             <div className="flex flex-wrap gap-4 justify-center md:justify-start">
               <Link to="/register">
@@ -78,9 +73,7 @@ const HeroSection = () => {
                   <p className="text-green-400">
                     &gt; Comunidade conectada
                   </p>
-                  <p className="text-green-400">
-                    &gt; Tutoriais carregados
-                  </p>
+                  <p className="text-green-400">> Tutoriais carregados</p>
                   <p className="text-green-400">
                     &gt; CTFs disponíveis
                   </p>
@@ -97,8 +90,6 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default HeroSection;
