@@ -1,6 +1,7 @@
-
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -14,15 +15,18 @@ import { User, Lock, Bell, Shield, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const AccountSettings = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('profile');
   
   // Mock user data
   const [userData, setUserData] = useState({
-    username: 'hackerman',
-    displayName: 'Hacker Silva',
-    email: 'hacker@example.com',
-    bio: 'Entusiasta de segurança cibernética e CTFs. Sempre aprendendo novas técnicas de hacking ético.',
+    username: '',
+    displayName: '',
+    email: '',
+    bio: '',
     avatar: '',
     currentPassword: '',
     newPassword: '',
@@ -37,6 +41,38 @@ const AccountSettings = () => {
   
   const [isLoading, setIsLoading] = useState(false);
   
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    const fetchProfile = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (error) throw error;
+
+        setUserData(prevData => ({
+          ...prevData,
+          ...data
+        }));
+      } catch (error: any) {
+        toast({
+          title: "Erro ao carregar perfil",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchProfile();
+  }, [user, navigate]);
+
   const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setUserData({
@@ -63,36 +99,44 @@ const AccountSettings = () => {
     });
   };
   
-  const handleProfileSubmit = (e: React.FormEvent) => {
+  const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          username: userData.username,
+          bio: userData.bio,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user?.id);
+
+      if (error) throw error;
+
       toast({
         title: "Perfil atualizado",
-        description: "Suas informações de perfil foram atualizadas com sucesso.",
+        description: "Suas informações foram atualizadas com sucesso.",
       });
-    }, 1000);
+    } catch (error: any) {
+      toast({
+        title: "Erro ao atualizar perfil",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (userData.newPassword !== userData.confirmPassword) {
       toast({
         title: "Erro ao atualizar senha",
-        description: "As senhas não coincidem. Tente novamente.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    if (userData.newPassword.length < 6) {
-      toast({
-        title: "Erro ao atualizar senha",
-        description: "A senha precisa ter pelo menos 6 caracteres.",
+        description: "As senhas não coincidem.",
         variant: "destructive",
       });
       return;
@@ -100,20 +144,33 @@ const AccountSettings = () => {
     
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      setUserData({
-        ...userData,
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: userData.newPassword
+      });
+
+      if (error) throw error;
+
+      setUserData(prev => ({
+        ...prev,
         currentPassword: '',
         newPassword: '',
         confirmPassword: ''
-      });
+      }));
+
       toast({
         title: "Senha atualizada",
         description: "Sua senha foi atualizada com sucesso.",
       });
-    }, 1000);
+    } catch (error: any) {
+      toast({
+        title: "Erro ao atualizar senha",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   const handleNotificationsSubmit = (e: React.FormEvent) => {

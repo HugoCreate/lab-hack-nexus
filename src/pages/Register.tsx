@@ -1,6 +1,7 @@
-
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,6 +18,9 @@ const Register = () => {
   });
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  const { toast } = useToast();
+  const navigate = useNavigate();
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -65,18 +69,43 @@ const Register = () => {
     return Object.keys(newErrors).length === 0;
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (validate()) {
       setIsLoading(true);
       
-      // Simulate registration process
-      setTimeout(() => {
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            data: {
+              username: formData.username,
+              is_admin: false // Default to non-admin users
+            }
+          }
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Registro realizado com sucesso!",
+          description: "Você será redirecionado para fazer login.",
+        });
+
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
+      } catch (error: any) {
+        toast({
+          title: "Erro no registro",
+          description: error.message,
+          variant: "destructive",
+        });
+      } finally {
         setIsLoading(false);
-        console.log('Registration data:', formData);
-        // Here you would normally call a registration API
-      }, 1500);
+      }
     }
   };
   

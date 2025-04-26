@@ -9,22 +9,55 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          id: string
+          is_admin: boolean | null
+          updated_at: string | null
+          username: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          id: string
+          is_admin?: boolean | null
+          updated_at?: string | null
+          username: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          id?: string
+          is_admin?: boolean | null
+          updated_at?: string | null
+          username?: string
+        }
+        Relationships: []
+      }
       "users_credentials_test(unsafe-)": {
         Row: {
           created_at: string
           id: number
+          is_admin: boolean | null
           Passwords: string | null
           Users: string | null
         }
         Insert: {
           created_at?: string
           id?: number
+          is_admin?: boolean | null
           Passwords?: string | null
           Users?: string | null
         }
         Update: {
           created_at?: string
           id?: number
+          is_admin?: boolean | null
           Passwords?: string | null
           Users?: string | null
         }
