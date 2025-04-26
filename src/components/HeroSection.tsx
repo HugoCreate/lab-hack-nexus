@@ -1,7 +1,9 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Terminal, Shield, ChevronRight } from 'lucide-react';
+
 const HeroSection = () => {
   return <div className="relative overflow-hidden bg-cyber-black py-16 md:py-24 cyber-grid">
       {/* Glow Effects */}
@@ -73,7 +75,7 @@ const HeroSection = () => {
                   <p className="text-green-400">
                     &gt; Comunidade conectada
                   </p>
-                  <p className="text-green-400">> Tutoriais carregados</p>
+                  <p className="text-green-400">&gt; Tutoriais carregados</p>
                   <p className="text-green-400">
                     &gt; CTFs disponíveis
                   </p>
@@ -92,4 +94,5 @@ const HeroSection = () => {
       </div>
     </div>;
 };
+
 export default HeroSection;

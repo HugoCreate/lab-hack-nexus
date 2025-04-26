@@ -13,6 +13,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AccountSettings from "./pages/AccountSettings";
 import NotFound from "./pages/NotFound";
+import Sobre from "./pages/Sobre";
+import Termos from "./pages/Termos";
+import Privacidade from "./pages/Privacidade";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +34,9 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/account/settings" element={<AccountSettings />} />
+          <Route path="/sobre" element={<Sobre />} />
+          <Route path="/termos" element={<Termos />} />
+          <Route path="/privacidade" element={<Privacidade />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

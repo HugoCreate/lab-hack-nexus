@@ -19,13 +19,13 @@ const Footer = () => {
               Uma comunidade para aspirantes e profissionais de hacking e cibersegurança compartilharem conhecimento.
             </p>
             <div className="flex items-center space-x-4 pt-2">
-              <a href="#" className="text-muted-foreground hover:text-cyber-purple transition-colors">
+              <a href="https://github.com" target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-cyber-purple transition-colors">
                 <Github className="h-5 w-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-cyber-purple transition-colors">
+              <a href="https://twitter.com" target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-cyber-purple transition-colors">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-cyber-purple transition-colors">
+              <a href="https://instagram.com" target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-cyber-purple transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
             </div>
