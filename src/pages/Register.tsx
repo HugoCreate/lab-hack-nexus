@@ -89,15 +89,19 @@ const Register = () => {
 
         if (error) throw error;
 
+        console.log("User registered successfully:", data);
+
         toast({
           title: "Registro realizado com sucesso!",
-          description: "Você será redirecionado para fazer login.",
+          description: "Verifique seu email para confirmar sua conta. Em seguida, faça login.",
         });
 
+        // Navigate to login page after registration
         setTimeout(() => {
           navigate('/login');
         }, 2000);
       } catch (error: any) {
+        console.error("Registration error:", error);
         toast({
           title: "Erro no registro",
           description: error.message,

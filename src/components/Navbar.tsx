@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
-import { Menu, X, Terminal, Shield, ChevronDown, User, LogOut } from 'lucide-react';
+import { Menu, X, Terminal, Shield, ChevronDown, User, LogOut, Settings } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,7 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -51,6 +51,11 @@ const Navbar = () => {
     if (!user) return "?";
     const email = user.email || "";
     return email.substring(0, 2).toUpperCase();
+  };
+
+  // Close mobile menu when clicking on a link
+  const handleLinkClick = () => {
+    setIsMenuOpen(false);
   };
 
   return (
@@ -100,7 +105,9 @@ const Navbar = () => {
 
         {/* Auth Buttons - Desktop */}
         <div className="hidden md:flex items-center space-x-4">
-          {user ? (
+          {isLoading ? (
+            <div className="h-8 w-8 rounded-full bg-cyber-purple/20 animate-pulse"></div>
+          ) : user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative rounded-full h-8 w-8 p-0">
@@ -158,7 +165,7 @@ const Navbar = () => {
             <Link 
               to="/" 
               className="text-lg font-medium p-2 hover:bg-cyber-purple/10 rounded"
-              onClick={() => setIsMenuOpen(false)}
+              onClick={handleLinkClick}
             >
               Home
             </Link>
@@ -169,7 +176,7 @@ const Navbar = () => {
                   key={category.path}
                   to={category.path}
                   className="block text-lg p-2 hover:bg-cyber-purple/10 rounded"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={handleLinkClick}
                 >
                   <span className="text-cyber-purple-light">{'>'}</span> {category.name}
                 </Link>
@@ -177,7 +184,7 @@ const Navbar = () => {
               <Link
                 to="/categories"
                 className="block text-lg p-2 text-cyber-purple hover:bg-cyber-purple/10 rounded"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={handleLinkClick}
               >
                 Ver todas categorias
               </Link>
@@ -185,14 +192,16 @@ const Navbar = () => {
             <Link 
               to="/posts" 
               className="text-lg font-medium p-2 hover:bg-cyber-purple/10 rounded"
-              onClick={() => setIsMenuOpen(false)}
+              onClick={handleLinkClick}
             >
               Posts
             </Link>
             <div className="border-t border-cyber-purple/20 pt-4 flex flex-col space-y-2">
-              {user ? (
+              {isLoading ? (
+                <div className="h-10 bg-cyber-purple/20 rounded animate-pulse"></div>
+              ) : user ? (
                 <>
-                  <Link to="/account/settings" onClick={() => setIsMenuOpen(false)}>
+                  <Link to="/account/settings" onClick={handleLinkClick}>
                     <Button variant="outline" className="w-full border-cyber-purple/30 flex items-center justify-center">
                       <User className="mr-2 h-4 w-4" />
                       Meu Perfil
@@ -201,7 +210,7 @@ const Navbar = () => {
                   <Button 
                     className="w-full bg-red-900 hover:bg-red-800 flex items-center justify-center"
                     onClick={() => {
-                      setIsMenuOpen(false);
+                      handleLinkClick();
                       handleLogout();
                     }}
                   >
@@ -211,12 +220,12 @@ const Navbar = () => {
                 </>
               ) : (
                 <>
-                  <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                  <Link to="/login" onClick={handleLinkClick}>
                     <Button variant="outline" className="w-full border-cyber-purple/30">
                       Login
                     </Button>
                   </Link>
-                  <Link to="/register" onClick={() => setIsMenuOpen(false)}>
+                  <Link to="/register" onClick={handleLinkClick}>
                     <Button className="w-full bg-cyber-purple hover:bg-cyber-purple-dark">
                       Registrar
                     </Button>
