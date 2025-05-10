@@ -2,13 +2,15 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
-import { Menu, X, Terminal, Shield, ChevronDown, User, LogOut, Settings } from 'lucide-react';
+import { Menu, X, Terminal, Shield, ChevronDown, User, LogOut, Settings, FileText, Users } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
 } from './ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -20,6 +22,30 @@ const Navbar = () => {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  React.useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (!user) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', user.id)
+          .single();
+
+        if (error) throw error;
+        setIsAdmin(data?.is_admin || false);
+      } catch (error) {
+        console.error('Error checking admin status:', error);
+      }
+    };
+
+    if (user) {
+      checkAdminStatus();
+    }
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -101,6 +127,11 @@ const Navbar = () => {
           <Link to="/posts" className="text-sm font-medium hover:text-cyber-purple transition-colors">
             Posts
           </Link>
+          {user && (
+            <Link to="/create-post" className="text-sm font-medium hover:text-cyber-purple transition-colors">
+              Criar Post
+            </Link>
+          )}
         </div>
 
         {/* Auth Buttons - Desktop */}
@@ -120,12 +151,40 @@ const Navbar = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-cyber-dark border-cyber-purple/30 w-56">
-                <DropdownMenuItem asChild>
-                  <Link to="/account/settings" className="flex items-center">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Meu Perfil</span>
-                  </Link>
-                </DropdownMenuItem>
+                <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-cyber-purple/20" />
+                
+                <DropdownMenuGroup>
+                  <DropdownMenuItem asChild>
+                    <Link to="/account/settings" className="flex items-center">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Meu Perfil</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  
+                  <DropdownMenuItem asChild>
+                    <Link to="/account/posts" className="flex items-center">
+                      <FileText className="mr-2 h-4 w-4" />
+                      <span>Meus Posts</span>
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                
+                {isAdmin && (
+                  <>
+                    <DropdownMenuSeparator className="bg-cyber-purple/20" />
+                    <DropdownMenuGroup>
+                      <DropdownMenuLabel className="text-cyber-purple">Admin</DropdownMenuLabel>
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin" className="flex items-center">
+                          <Settings className="mr-2 h-4 w-4" />
+                          <span>Painel Admin</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                  </>
+                )}
+                
                 <DropdownMenuSeparator className="bg-cyber-purple/20" />
                 <DropdownMenuItem onClick={handleLogout} className="text-red-500 cursor-pointer">
                   <LogOut className="mr-2 h-4 w-4" />
@@ -196,6 +255,17 @@ const Navbar = () => {
             >
               Posts
             </Link>
+            
+            {user && (
+              <Link 
+                to="/create-post" 
+                className="text-lg font-medium p-2 hover:bg-cyber-purple/10 rounded"
+                onClick={handleLinkClick}
+              >
+                Criar Post
+              </Link>
+            )}
+            
             <div className="border-t border-cyber-purple/20 pt-4 flex flex-col space-y-2">
               {isLoading ? (
                 <div className="h-10 bg-cyber-purple/20 rounded animate-pulse"></div>
@@ -207,6 +277,23 @@ const Navbar = () => {
                       Meu Perfil
                     </Button>
                   </Link>
+                  
+                  <Link to="/account/posts" onClick={handleLinkClick}>
+                    <Button variant="outline" className="w-full border-cyber-purple/30 flex items-center justify-center">
+                      <FileText className="mr-2 h-4 w-4" />
+                      Meus Posts
+                    </Button>
+                  </Link>
+                  
+                  {isAdmin && (
+                    <Link to="/admin" onClick={handleLinkClick}>
+                      <Button variant="outline" className="w-full border-cyber-purple/30 flex items-center justify-center">
+                        <Settings className="mr-2 h-4 w-4" />
+                        Painel Admin
+                      </Button>
+                    </Link>
+                  )}
+                  
                   <Button 
                     className="w-full bg-red-900 hover:bg-red-800 flex items-center justify-center"
                     onClick={() => {

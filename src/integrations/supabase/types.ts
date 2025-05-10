@@ -9,6 +9,80 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      posts: {
+        Row: {
+          author_id: string
+          category_id: string | null
+          content: string
+          created_at: string
+          id: string
+          published: boolean
+          slug: string
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          category_id?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          published?: boolean
+          slug: string
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          category_id?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          published?: boolean
+          slug?: string
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_category"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -39,27 +113,30 @@ export type Database = {
         }
         Relationships: []
       }
-      "users_credentials_test(unsafe-)": {
+      website_content: {
         Row: {
+          content: Json
           created_at: string
-          id: number
-          is_admin: boolean | null
-          Passwords: string | null
-          Users: string | null
+          id: string
+          page_name: string
+          updated_at: string
+          updated_by: string
         }
         Insert: {
+          content: Json
           created_at?: string
-          id?: number
-          is_admin?: boolean | null
-          Passwords?: string | null
-          Users?: string | null
+          id?: string
+          page_name: string
+          updated_at?: string
+          updated_by: string
         }
         Update: {
+          content?: Json
           created_at?: string
-          id?: number
-          is_admin?: boolean | null
-          Passwords?: string | null
-          Users?: string | null
+          id?: string
+          page_name?: string
+          updated_at?: string
+          updated_by?: string
         }
         Relationships: []
       }
@@ -68,7 +145,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
