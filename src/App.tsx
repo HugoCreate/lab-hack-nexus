@@ -10,6 +10,7 @@ import Categories from "./pages/Categories";
 import Posts from "./pages/Posts";
 import CategoryPage from "./pages/CategoryPage";
 import PostPage from "./pages/PostPage";
+import SavedPosts from "./pages/SavedPosts";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AccountSettings from "./pages/AccountSettings";
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/posts" element={<Posts />} />
             <Route path="/category/:slug" element={<CategoryPage />} />
             <Route path="/post/:slug" element={<PostPage />} />
+            <Route path="/saved-posts" element={<SavedPosts />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/account/settings" element={<AccountSettings />} />

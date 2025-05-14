@@ -1,12 +1,17 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, Share2, BookmarkIcon, MessageCircle } from 'lucide-react';
+import { Calendar, Clock, BookmarkIcon, MessageCircle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import CommentSection from '@/components/CommentSection';
+import SharePost from '@/components/SharePost';
+import { useSavedPosts } from '@/hooks/useSavedPosts';
+import { useToast } from '@/hooks/use-toast';
 
 // Combining all mock posts
 const allPosts = [
@@ -104,7 +109,52 @@ const allPosts = [
 
 const PostPage = () => {
   const { slug } = useParams<{ slug: string }>();
-  const post = allPosts.find(p => p.slug === slug);
+  const [post, setPost] = useState<any>(null);
+  const [relatedPosts, setRelatedPosts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
+  const { toast } = useToast();
+  
+  // For now, we'll use the mock data, but in a real app you'd fetch from Supabase
+  useEffect(() => {
+    // Simulate loading
+    setIsLoading(true);
+    
+    setTimeout(() => {
+      const foundPost = allPosts.find(p => p.slug === slug);
+      setPost(foundPost || null);
+      
+      if (foundPost && foundPost.relatedPosts) {
+        const related = foundPost.relatedPosts
+          .map(id => allPosts.find(p => p.id === id))
+          .filter(Boolean);
+        setRelatedPosts(related);
+      }
+      
+      setIsLoading(false);
+    }, 300);
+  }, [slug]);
+  
+  // Initialize the saved posts hook
+  const postId = post?.id || '';
+  const { isSaved, isLoading: isSavedLoading, isSaving, toggleSave } = useSavedPosts(postId);
+  
+  // Get the current URL for sharing
+  const currentUrl = window.location.href;
+  
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <Navbar />
+        <div className="container mx-auto px-4 py-16 flex-grow">
+          <div className="text-center py-16">
+            <p className="text-muted-foreground">Carregando post...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
   
   if (!post) {
     return (
@@ -128,9 +178,18 @@ const PostPage = () => {
     );
   }
   
-  const relatedPosts = post.relatedPosts ? 
-    post.relatedPosts.map(id => allPosts.find(p => p.id === id)).filter(Boolean) : 
-    [];
+  const handleSaveClick = () => {
+    if (!user) {
+      toast({
+        title: 'Login necessário',
+        description: 'Você precisa estar logado para salvar posts.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    toggleSave();
+  };
   
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -225,6 +284,9 @@ const PostPage = () => {
                 </div>
               </div>
             </div>
+            
+            {/* Comments Section */}
+            <CommentSection postId={post.id} />
           </div>
           
           <div className="md:w-1/4">
@@ -232,15 +294,23 @@ const PostPage = () => {
               {/* Post actions */}
               <div className="cyber-card p-6">
                 <div className="flex flex-col space-y-4">
-                  <Button variant="outline" className="w-full border-cyber-purple/30 hover:bg-cyber-purple/10 flex items-center justify-center">
+                  <Button 
+                    variant="outline" 
+                    className={`w-full ${isSaved ? 'bg-cyber-purple/20 border-cyber-purple' : 'border-cyber-purple/30 hover:bg-cyber-purple/10'} flex items-center justify-center`}
+                    onClick={handleSaveClick}
+                    disabled={isSavedLoading || isSaving}
+                  >
                     <BookmarkIcon className="mr-2 h-4 w-4" />
-                    Salvar
+                    {isSaved ? 'Salvo' : 'Salvar'}
                   </Button>
-                  <Button variant="outline" className="w-full border-cyber-purple/30 hover:bg-cyber-purple/10 flex items-center justify-center">
-                    <Share2 className="mr-2 h-4 w-4" />
-                    Compartilhar
-                  </Button>
-                  <Button variant="outline" className="w-full border-cyber-purple/30 hover:bg-cyber-purple/10 flex items-center justify-center">
+                  
+                  <SharePost postTitle={post.title} postUrl={currentUrl} />
+                  
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-cyber-purple/30 hover:bg-cyber-purple/10 flex items-center justify-center"
+                    onClick={() => document.querySelector('#comments')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
                     <MessageCircle className="mr-2 h-4 w-4" />
                     Comentar
                   </Button>
