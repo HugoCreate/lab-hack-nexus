@@ -84,7 +84,8 @@ const WebsiteEditor = () => {
       setPages(data || []);
       if (data && data.length > 0) {
         setSelectedPage(data[0].id);
-        setCurrentContent(data[0].content);
+        // Fix TypeScript error: Explicitly cast content to correct type
+        setCurrentContent(data[0].content as Record<string, any>);
       }
       setIsLoading(false);
     } catch (error: any) {
@@ -102,7 +103,8 @@ const WebsiteEditor = () => {
     const selectedPageData = pages.find(page => page.id === pageId);
     if (selectedPageData) {
       setSelectedPage(pageId);
-      setCurrentContent(selectedPageData.content);
+      // Fix TypeScript error: Explicitly cast content to correct type
+      setCurrentContent(selectedPageData.content as Record<string, any>);
     }
   };
 
@@ -182,7 +184,7 @@ const WebsiteEditor = () => {
       if (data) {
         setPages([...pages, ...data]);
         setSelectedPage(data[0].id);
-        setCurrentContent(data[0].content);
+        setCurrentContent(data[0].content as Record<string, any>);
       }
 
       setNewPageName('');
@@ -305,7 +307,7 @@ const WebsiteEditor = () => {
                                           ...newSections[index],
                                           [itemKey]: e.target.value
                                         };
-                                        handleContentChange(key, newSections);
+                                        handleContentChange(key, newSections as unknown as string);
                                       }}
                                       className="min-h-[100px] border-cyber-purple/20"
                                     />
@@ -318,7 +320,7 @@ const WebsiteEditor = () => {
                                           ...newSections[index],
                                           [itemKey]: e.target.value
                                         };
-                                        handleContentChange(key, newSections);
+                                        handleContentChange(key, newSections as unknown as string);
                                       }}
                                       className="border-cyber-purple/20"
                                     />
