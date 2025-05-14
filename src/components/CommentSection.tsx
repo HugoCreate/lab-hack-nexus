@@ -16,7 +16,7 @@ interface Comment {
   profile?: {
     username: string;
     avatar_url: string | null;
-  };
+  } | null;
 }
 
 interface CommentSectionProps {
@@ -35,17 +35,31 @@ const CommentSection = ({ postId }: CommentSectionProps) => {
   const fetchComments = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      // Get all comments for this post
+      const { data: commentsData, error: commentsError } = await supabase
         .from('comments')
-        .select(`
-          *,
-          profile:profiles(username, avatar_url)
-        `)
+        .select('*')
         .eq('post_id', postId)
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
-      setComments(data || []);
+      if (commentsError) throw commentsError;
+      
+      // Fetch profiles separately
+      const processedComments = await Promise.all((commentsData || []).map(async (comment) => {
+        // Get the user profile for this comment
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('username, avatar_url')
+          .eq('id', comment.user_id)
+          .single();
+        
+        return {
+          ...comment,
+          profile: profileError ? null : profileData
+        };
+      }));
+      
+      setComments(processedComments);
     } catch (error: any) {
       console.error('Error fetching comments:', error.message);
       toast({
@@ -118,7 +132,7 @@ const CommentSection = ({ postId }: CommentSectionProps) => {
   }, [postId]);
 
   return (
-    <div className="mt-8">
+    <div className="mt-8" id="comments">
       <h3 className="text-xl font-bold mb-6 flex items-center">
         <MessageSquare className="mr-2" />
         Comentários
@@ -160,7 +174,7 @@ const CommentSection = ({ postId }: CommentSectionProps) => {
                 <Avatar className="h-10 w-10">
                   <AvatarImage src={comment.profile?.avatar_url || ''} />
                   <AvatarFallback className="bg-cyber-purple/20 text-cyber-purple">
-                    {comment.profile?.username.charAt(0).toUpperCase() || 'U'}
+                    {comment.profile?.username ? comment.profile.username.charAt(0).toUpperCase() : 'U'}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
