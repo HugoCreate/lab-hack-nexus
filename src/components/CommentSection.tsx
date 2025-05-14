@@ -35,7 +35,11 @@ const CommentSection = ({ postId }: CommentSectionProps) => {
   const fetchComments = async () => {
     setIsLoading(true);
     try {
-      // Get all comments for this post
+      // Get all comments for this post with proper UUID validation
+      if (!postId || typeof postId !== 'string') {
+        throw new Error('Invalid post ID');
+      }
+      
       const { data: commentsData, error: commentsError } = await supabase
         .from('comments')
         .select('*')
@@ -96,6 +100,10 @@ const CommentSection = ({ postId }: CommentSectionProps) => {
     
     setIsSubmitting(true);
     try {
+      if (!postId || typeof postId !== 'string') {
+        throw new Error('Invalid post ID');
+      }
+      
       const { error } = await supabase
         .from('comments')
         .insert({

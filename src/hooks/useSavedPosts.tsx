@@ -18,6 +18,13 @@ export function useSavedPosts(postId: string) {
       return;
     }
     
+    // Validate post ID
+    if (!postId || typeof postId !== 'string') {
+      console.error('Invalid post ID provided to useSavedPosts');
+      setIsLoading(false);
+      return;
+    }
+    
     try {
       const { data, error } = await supabase
         .from('saved_posts')
@@ -45,6 +52,16 @@ export function useSavedPosts(postId: string) {
       toast({
         title: 'Login necessário',
         description: 'Você precisa estar logado para salvar posts.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    // Validate post ID
+    if (!postId || typeof postId !== 'string') {
+      toast({
+        title: 'Erro',
+        description: 'ID do post inválido.',
         variant: 'destructive',
       });
       return;

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -11,7 +10,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import CommentSection from '@/components/CommentSection';
 import SharePost from '@/components/SharePost';
 import { useSavedPosts } from '@/hooks/useSavedPosts';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 // Combining all mock posts
 const allPosts = [
@@ -135,7 +135,7 @@ const PostPage = () => {
     }, 300);
   }, [slug]);
   
-  // Initialize the saved posts hook
+  // Initialize the saved posts hook with a string ID that works with the database
   const postId = post?.id || '';
   const { isSaved, isLoading: isSavedLoading, isSaving, toggleSave } = useSavedPosts(postId);
   
