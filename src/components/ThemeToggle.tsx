@@ -31,29 +31,29 @@ const ThemeToggle: React.FC = () => {
         <Button 
           variant="outline" 
           size="icon" 
-          className="rounded-full border-cyber-purple/30 hover:bg-cyber-purple/10"
+          className={`rounded-full border ${theme === 'light' ? 'border-cyber-purple/70' : 'border-cyber-purple/30'} ${theme === 'light' ? 'hover:bg-gray-200' : 'hover:bg-cyber-purple/10'}`}
         >
           {getIcon()}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="bg-cyber-dark border-cyber-purple/30 w-40">
+      <DropdownMenuContent align="end" className={`${theme === 'light' ? 'bg-white border-gray-200' : 'bg-cyber-dark border-cyber-purple/30'} w-40`}>
         <DropdownMenuItem 
           onClick={() => setTheme('light')}
-          className={`flex items-center gap-2 hover:bg-cyber-purple/10 ${theme === 'light' ? 'text-cyber-purple' : ''}`}
+          className={`flex items-center gap-2 ${theme === 'light' ? 'hover:bg-gray-100 text-primary' : 'hover:bg-cyber-purple/10'} ${theme === 'light' ? 'text-primary' : ''}`}
         >
           <Sun className="h-4 w-4" />
           <span>Light</span>
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => setTheme('dark')}
-          className={`flex items-center gap-2 hover:bg-cyber-purple/10 ${theme === 'dark' ? 'text-cyber-purple' : ''}`}
+          className={`flex items-center gap-2 ${theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-cyber-purple/10'} ${theme === 'dark' ? 'text-cyber-purple' : ''}`}
         >
           <Moon className="h-4 w-4" />
           <span>Dark</span>
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => setTheme('high-contrast')}
-          className={`flex items-center gap-2 hover:bg-cyber-purple/10 ${theme === 'high-contrast' ? 'text-cyber-purple' : ''}`}
+          className={`flex items-center gap-2 ${theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-cyber-purple/10'} ${theme === 'high-contrast' ? 'text-cyber-purple' : ''}`}
         >
           <Contrast className="h-4 w-4" />
           <span>High Contrast</span>

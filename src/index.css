@@ -38,7 +38,7 @@
     --radius: 0.5rem;
   }
 
-  /* Light theme */
+  /* Light theme - Improved for better contrast and readability */
   :root.light {
     --background: 0 0% 98%;
     --foreground: 240 10% 15%;
@@ -49,24 +49,24 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 15%;
 
-    --primary: 254 70% 65%;
+    --primary: 254 70% 45%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 5% 90%;
+    --secondary: 240 5% 92%;
     --secondary-foreground: 240 10% 15%;
 
     --muted: 240 5% 92%;
-    --muted-foreground: 240 4% 45%;
+    --muted-foreground: 240 4% 35%;
 
-    --accent: 217 91% 55%;
+    --accent: 217 91% 45%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 84% 50%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 5% 85%;
-    --input: 240 5% 85%;
-    --ring: 254 70% 65%;
+    --border: 240 5% 80%;
+    --input: 240 5% 80%;
+    --ring: 254 70% 45%;
 
     --radius: 0.5rem;
   }
