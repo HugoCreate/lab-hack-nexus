@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -14,7 +13,7 @@ import {
 } from '@/components/ui/select';
 import { Search } from 'lucide-react';
 
-// Mock Data - combined from Index.tsx
+// Mock Data - filtered to include only posts with substantial content
 const allPosts = [
   {
     id: '1',
@@ -70,40 +69,7 @@ const allPosts = [
     author: { name: 'Ana Souza', avatar: '/placeholder.svg' },
     publishedAt: '18 Mar 2023',
     readTime: 15
-  },
-  {
-    id: '6',
-    title: 'Entendendo ataques de força bruta e como se proteger',
-    excerpt: 'Um guia completo sobre como funcionam os ataques de força bruta e quais medidas adotar para proteger seus sistemas.',
-    slug: 'ataques-forca-bruta',
-    coverImage: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?auto=format&fit=crop&w=800&q=80',
-    category: { name: 'Introdução a Hacking', slug: 'introducao-hacking' },
-    author: { name: 'Pedro Costa', avatar: '/placeholder.svg' },
-    publishedAt: '25 Mar 2023',
-    readTime: 7
-  },
-  {
-    id: '7',
-    title: 'Criando seu primeiro script de exploração em Python',
-    excerpt: 'Um tutorial prático para desenvolver ferramentas personalizadas para testes de segurança usando Python.',
-    slug: 'script-exploracao-python',
-    coverImage: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=800&q=80',
-    category: { name: 'Web App Hacking', slug: 'web-app-hacking' },
-    author: { name: 'Lucas Ferreira', avatar: '/placeholder.svg' },
-    publishedAt: '10 Abr 2023',
-    readTime: 18
-  },
-  {
-    id: '8',
-    title: 'Ataques de Phishing modernos: Como identificar e prevenir',
-    excerpt: 'Aprenda sobre as técnicas avançadas de phishing e como proteger a si mesmo e sua organização.',
-    slug: 'ataques-phishing-modernos',
-    coverImage: 'https://images.unsplash.com/photo-1563968743333-044cee2ca0b4?auto=format&fit=crop&w=800&q=80',
-    category: { name: 'Engenharia Social', slug: 'engenharia-social' },
-    author: { name: 'Gabriela Santos', avatar: '/placeholder.svg' },
-    publishedAt: '02 Mai 2023',
-    readTime: 9
-  },
+  }
 ];
 
 // Extract unique categories

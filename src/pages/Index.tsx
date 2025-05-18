@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -9,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 
-// Mock data
+// Mock data for categories
 const categories = [
   {
     id: '1',
@@ -53,6 +52,7 @@ const categories = [
   }
 ];
 
+// Featured posts - only keeping posts with substantial content
 const featuredPosts = [
   {
     id: '1',
@@ -89,6 +89,7 @@ const featuredPosts = [
   }
 ];
 
+// Recent posts - only keeping posts with substantial content
 const recentPosts = [
   {
     id: '4',
@@ -111,17 +112,6 @@ const recentPosts = [
     author: { name: 'Ana Souza', avatar: '/placeholder.svg' },
     publishedAt: '18 Mar 2023',
     readTime: 15
-  },
-  {
-    id: '6',
-    title: 'Entendendo ataques de força bruta e como se proteger',
-    excerpt: 'Um guia completo sobre como funcionam os ataques de força bruta e quais medidas adotar para proteger seus sistemas.',
-    slug: 'ataques-forca-bruta',
-    coverImage: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?auto=format&fit=crop&w=800&q=80',
-    category: { name: 'Introdução a Hacking', slug: 'introducao-hacking' },
-    author: { name: 'Pedro Costa', avatar: '/placeholder.svg' },
-    publishedAt: '25 Mar 2023',
-    readTime: 7
   }
 ];
 

@@ -86,22 +86,22 @@ const Navbar = () => {
 
   return (
     <nav className="border-b border-cyber-purple/20 bg-background/95 backdrop-blur-md sticky top-0 z-40 w-full">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        <Link to="/" className="flex items-center space-x-2">
+      <div className="container mx-auto px-2 py-3 flex items-center">
+        <Link to="/" className="flex items-center space-x-2 mr-8">
           <Shield className="h-8 w-8 text-cyber-purple" />
           <span className="text-xl font-bold bg-gradient-to-r from-cyber-purple to-cyber-blue bg-clip-text text-transparent">
             Lab<span className="text-cyber-purple-light">Hack</span>
           </span>
         </Link>
 
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex md:items-center md:space-x-6">
-          <Link to="/" className="text-sm font-medium hover:text-cyber-purple transition-colors">
+        {/* Desktop Navigation - Moved closer to logo */}
+        <div className="hidden md:flex md:items-center md:space-x-4 flex-grow">
+          <Link to="/" className="text-sm font-medium hover:text-cyber-purple transition-colors border border-cyber-purple/30 rounded-md px-3 py-1.5 hover:bg-cyber-purple/10">
             Home
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center space-x-1 py-2">
+              <Button variant="outline" className="flex items-center space-x-1 py-1.5 border-cyber-purple/30 hover:bg-cyber-purple/10">
                 <span>Categorias</span>
                 <ChevronDown className="h-4 w-4" />
               </Button>
@@ -124,24 +124,24 @@ const Navbar = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Link to="/posts" className="text-sm font-medium hover:text-cyber-purple transition-colors">
+          <Link to="/posts" className="text-sm font-medium hover:text-cyber-purple transition-colors border border-cyber-purple/30 rounded-md px-3 py-1.5 hover:bg-cyber-purple/10">
             Posts
           </Link>
           {user && (
-            <Link to="/create-post" className="text-sm font-medium hover:text-cyber-purple transition-colors">
+            <Link to="/create-post" className="text-sm font-medium hover:text-cyber-purple transition-colors border border-cyber-purple/30 rounded-md px-3 py-1.5 hover:bg-cyber-purple/10">
               Criar Post
             </Link>
           )}
         </div>
 
-        {/* Auth Buttons - Desktop */}
-        <div className="hidden md:flex items-center space-x-4">
+        {/* Auth Buttons - Desktop - Moved to the right */}
+        <div className="hidden md:flex items-center space-x-4 ml-auto">
           {isLoading ? (
             <div className="h-8 w-8 rounded-full bg-cyber-purple/20 animate-pulse"></div>
           ) : user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative rounded-full h-8 w-8 p-0">
+                <Button variant="outline" className="relative rounded-full h-8 w-8 p-0 border-cyber-purple/30">
                   <Avatar className="h-8 w-8 border border-cyber-purple/30">
                     <AvatarImage src="" />
                     <AvatarFallback className="bg-cyber-purple/10 text-cyber-purple">
@@ -195,10 +195,10 @@ const Navbar = () => {
           ) : (
             <>
               <Link to="/login">
-                <Button variant="ghost" className="text-sm hover:text-cyber-purple">Login</Button>
+                <Button variant="outline" className="text-sm hover:text-cyber-purple border-cyber-purple/30 hover:bg-cyber-purple/10">Login</Button>
               </Link>
               <Link to="/register">
-                <Button className="bg-cyber-purple hover:bg-cyber-purple-dark text-sm">Registrar</Button>
+                <Button className="bg-cyber-purple hover:bg-cyber-purple-dark text-sm border border-cyber-purple">Registrar</Button>
               </Link>
             </>
           )}
@@ -206,7 +206,7 @@ const Navbar = () => {
 
         {/* Mobile Menu Button */}
         <button
-          className="md:hidden text-white"
+          className="md:hidden text-white ml-auto"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           {isMenuOpen ? (
@@ -223,7 +223,7 @@ const Navbar = () => {
           <div className="container mx-auto px-4 py-4 flex flex-col space-y-4">
             <Link 
               to="/" 
-              className="text-lg font-medium p-2 hover:bg-cyber-purple/10 rounded"
+              className="text-lg font-medium p-2 hover:bg-cyber-purple/10 rounded border border-cyber-purple/30"
               onClick={handleLinkClick}
             >
               Home
@@ -234,7 +234,7 @@ const Navbar = () => {
                 <Link
                   key={category.path}
                   to={category.path}
-                  className="block text-lg p-2 hover:bg-cyber-purple/10 rounded"
+                  className="block text-lg p-2 hover:bg-cyber-purple/10 rounded border border-cyber-purple/30 mt-2"
                   onClick={handleLinkClick}
                 >
                   <span className="text-cyber-purple-light">{'>'}</span> {category.name}
@@ -242,7 +242,7 @@ const Navbar = () => {
               ))}
               <Link
                 to="/categories"
-                className="block text-lg p-2 text-cyber-purple hover:bg-cyber-purple/10 rounded"
+                className="block text-lg p-2 text-cyber-purple hover:bg-cyber-purple/10 rounded border border-cyber-purple/30 mt-2"
                 onClick={handleLinkClick}
               >
                 Ver todas categorias
@@ -250,7 +250,7 @@ const Navbar = () => {
             </div>
             <Link 
               to="/posts" 
-              className="text-lg font-medium p-2 hover:bg-cyber-purple/10 rounded"
+              className="text-lg font-medium p-2 hover:bg-cyber-purple/10 rounded border border-cyber-purple/30"
               onClick={handleLinkClick}
             >
               Posts
@@ -259,7 +259,7 @@ const Navbar = () => {
             {user && (
               <Link 
                 to="/create-post" 
-                className="text-lg font-medium p-2 hover:bg-cyber-purple/10 rounded"
+                className="text-lg font-medium p-2 hover:bg-cyber-purple/10 rounded border border-cyber-purple/30"
                 onClick={handleLinkClick}
               >
                 Criar Post
@@ -272,14 +272,14 @@ const Navbar = () => {
               ) : user ? (
                 <>
                   <Link to="/account/settings" onClick={handleLinkClick}>
-                    <Button variant="outline" className="w-full border-cyber-purple/30 flex items-center justify-center">
+                    <Button variant="outline" className="w-full border-cyber-purple/30 flex items-center justify-center hover:bg-cyber-purple/10">
                       <User className="mr-2 h-4 w-4" />
                       Meu Perfil
                     </Button>
                   </Link>
                   
                   <Link to="/account/posts" onClick={handleLinkClick}>
-                    <Button variant="outline" className="w-full border-cyber-purple/30 flex items-center justify-center">
+                    <Button variant="outline" className="w-full border-cyber-purple/30 flex items-center justify-center hover:bg-cyber-purple/10">
                       <FileText className="mr-2 h-4 w-4" />
                       Meus Posts
                     </Button>
@@ -287,7 +287,7 @@ const Navbar = () => {
                   
                   {isAdmin && (
                     <Link to="/admin" onClick={handleLinkClick}>
-                      <Button variant="outline" className="w-full border-cyber-purple/30 flex items-center justify-center">
+                      <Button variant="outline" className="w-full border-cyber-purple/30 flex items-center justify-center hover:bg-cyber-purple/10">
                         <Settings className="mr-2 h-4 w-4" />
                         Painel Admin
                       </Button>
@@ -295,7 +295,7 @@ const Navbar = () => {
                   )}
                   
                   <Button 
-                    className="w-full bg-red-900 hover:bg-red-800 flex items-center justify-center"
+                    className="w-full bg-red-900 hover:bg-red-800 flex items-center justify-center border border-red-700"
                     onClick={() => {
                       handleLinkClick();
                       handleLogout();
@@ -308,12 +308,12 @@ const Navbar = () => {
               ) : (
                 <>
                   <Link to="/login" onClick={handleLinkClick}>
-                    <Button variant="outline" className="w-full border-cyber-purple/30">
+                    <Button variant="outline" className="w-full border-cyber-purple/30 hover:bg-cyber-purple/10">
                       Login
                     </Button>
                   </Link>
                   <Link to="/register" onClick={handleLinkClick}>
-                    <Button className="w-full bg-cyber-purple hover:bg-cyber-purple-dark">
+                    <Button className="w-full bg-cyber-purple hover:bg-cyber-purple-dark border border-cyber-purple">
                       Registrar
                     </Button>
                   </Link>
