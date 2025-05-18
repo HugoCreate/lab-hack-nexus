@@ -5,6 +5,106 @@
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap');
 
 @layer base {
+  /* Dark theme (default) */
+  :root.dark {
+    --background: 260 15% 8%;
+    --foreground: 210 40% 98%;
+
+    --card: 260 10% 12%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 260 10% 12%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 254 80% 75%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 260 20% 20%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 260 15% 18%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 217 91% 60%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 260 20% 20%;
+    --input: 260 20% 20%;
+    --ring: 254 80% 75%;
+
+    --radius: 0.5rem;
+  }
+
+  /* Light theme */
+  :root.light {
+    --background: 0 0% 98%;
+    --foreground: 240 10% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 15%;
+
+    --primary: 254 70% 65%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 5% 90%;
+    --secondary-foreground: 240 10% 15%;
+
+    --muted: 240 5% 92%;
+    --muted-foreground: 240 4% 45%;
+
+    --accent: 217 91% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 5% 85%;
+    --input: 240 5% 85%;
+    --ring: 254 70% 65%;
+
+    --radius: 0.5rem;
+  }
+
+  /* High Contrast theme */
+  :root.high-contrast {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 47 100% 50%;
+    --primary-foreground: 0 0% 0%;
+
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 70%;
+
+    --accent: 211 100% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 30%;
+    --input: 0 0% 30%;
+    --ring: 47 100% 50%;
+
+    --radius: 0.25rem;
+  }
+
+  /* Default to dark theme if no class is applied */
   :root {
     --background: 260 15% 8%;
     --foreground: 210 40% 98%;
@@ -52,36 +152,5 @@
 }
 
 @layer components {
-  .cyber-border {
-    @apply relative;
-    &:before {
-      content: '';
-      @apply absolute -inset-[1px] bg-gradient-to-r from-cyber-purple via-cyber-blue to-cyber-purple-light rounded-md blur-[1px] opacity-70;
-      z-index: -1;
-    }
-  }
-  
-  .cyber-card {
-    @apply bg-card border border-cyber-purple/20 rounded-md shadow-lg shadow-cyber-purple/10 backdrop-blur-sm;
-  }
-
-  .terminal-text {
-    @apply font-mono text-cyber-blue relative;
-  }
-  
-  .terminal-text::after {
-    content: '|';
-    @apply animate-terminal-cursor opacity-0;
-  }
-
-  .cyber-glow {
-    @apply animate-glow;
-  }
-
-  .cyber-grid {
-    background-size: 50px 50px;
-    background-image: 
-      linear-gradient(to right, rgba(155, 135, 245, 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(155, 135, 245, 0.05) 1px, transparent 1px);
-  }
+  /* ... keep existing code (component styles) */
 }
