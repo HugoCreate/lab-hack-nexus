@@ -8,13 +8,14 @@ const Card = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
   const { theme } = useTheme();
+  const isLight = theme === 'light';
   
   return (
     <div
       ref={ref}
       className={cn(
-        "rounded-lg border bg-card text-card-foreground shadow-sm",
-        theme === 'light' ? "border-gray-200" : "border-cyber-purple/20",
+        "rounded-lg border shadow-sm",
+        isLight ? "bg-white border-gray-200 text-gray-800" : "bg-card text-card-foreground border-cyber-purple/20",
         className
       )}
       {...props}
@@ -40,13 +41,14 @@ const CardTitle = React.forwardRef<
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => {
   const { theme } = useTheme();
+  const isLight = theme === 'light';
   
   return (
     <h3
       ref={ref}
       className={cn(
         "text-2xl font-semibold leading-none tracking-tight",
-        theme === 'light' ? "text-gray-900" : "",
+        isLight ? "text-gray-900" : "",
         className
       )}
       {...props}
@@ -58,13 +60,22 @@ CardTitle.displayName = "CardTitle"
 const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
->(({ className, ...props }, ref) => (
-  <p
-    ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
-    {...props}
-  />
-))
+>(({ className, ...props }, ref) => {
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
+  
+  return (
+    <p
+      ref={ref}
+      className={cn(
+        isLight ? "text-gray-600" : "text-muted-foreground", 
+        "text-sm", 
+        className
+      )}
+      {...props}
+    />
+  )
+})
 CardDescription.displayName = "CardDescription"
 
 const CardContent = React.forwardRef<
@@ -80,13 +91,14 @@ const CardFooter = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
   const { theme } = useTheme();
+  const isLight = theme === 'light';
   
   return (
     <div
       ref={ref}
       className={cn(
         "flex items-center p-6 pt-0",
-        theme === 'light' ? "border-t border-gray-100" : "",
+        isLight ? "border-t border-gray-200" : "",
         className
       )}
       {...props}
