@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -48,39 +49,61 @@ const getCategoryIcon = (slug: string): 'code' | 'terminal' | 'wifi' | 'cpu' | '
 
 // Função para buscar posts do Supabase
 const fetchPosts = async () => {
-  const { data, error } = await supabase
-    .from('posts')
-    .select(`
-      *,
-      categories:category_id (name, slug),
-      profiles:author_id (username, avatar_url)
-    `)
-    .eq('published', true)
-    .order('created_at', { ascending: false });
-  
-  if (error) {
-    console.error('Error fetching posts:', error);
-    throw error;
+  try {
+    // Primeiro, buscamos os posts básicos
+    const { data: postsData, error: postsError } = await supabase
+      .from('posts')
+      .select(`
+        *,
+        categories:category_id (name, slug)
+      `)
+      .eq('published', true)
+      .order('created_at', { ascending: false });
+    
+    if (postsError) {
+      console.error('Error fetching posts:', postsError);
+      throw postsError;
+    }
+    
+    // Para cada post, buscamos informações do autor separadamente
+    const postsWithAuthors = await Promise.all(postsData.map(async (post) => {
+      // Buscar informações do autor
+      const { data: authorData } = await supabase
+        .from('profiles')
+        .select('username, avatar_url')
+        .eq('id', post.author_id)
+        .single();
+      
+      // Usar valores padrão se não encontrar o autor
+      const author = authorData || {
+        username: 'Autor desconhecido',
+        avatar_url: '/placeholder.svg'
+      };
+      
+      return {
+        id: post.id,
+        title: post.title,
+        excerpt: post.content ? post.content.substring(0, 150) + '...' : '',
+        slug: post.slug,
+        coverImage: post.thumbnail_url || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
+        category: {
+          name: post.categories?.name || 'Sem categoria',
+          slug: post.categories?.slug || ''
+        },
+        author: {
+          name: author.username,
+          avatar: author.avatar_url
+        },
+        publishedAt: new Date(post.created_at).toLocaleDateString('pt-BR'),
+        readTime: Math.ceil(post.content?.length / 1000) || 5
+      };
+    }));
+    
+    return postsWithAuthors;
+  } catch (error) {
+    console.error('Error processing posts:', error);
+    return [];
   }
-  
-  // Mapear os dados para o formato necessário para o PostCard
-  return data.map(post => ({
-    id: post.id,
-    title: post.title,
-    excerpt: post.content ? post.content.substring(0, 150) + '...' : '',
-    slug: post.slug,
-    coverImage: post.thumbnail_url || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
-    category: {
-      name: post.categories?.name || 'Sem categoria',
-      slug: post.categories?.slug || ''
-    },
-    author: {
-      name: post.profiles?.username || 'Autor desconhecido',
-      avatar: post.profiles?.avatar_url || '/placeholder.svg'
-    },
-    publishedAt: new Date(post.created_at).toLocaleDateString('pt-BR'),
-    readTime: Math.ceil(post.content?.length / 1000) || 5 // Estimativa simples: 1000 caracteres = 1 minuto de leitura
-  }));
 };
 
 const Index = () => {
