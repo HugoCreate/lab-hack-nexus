@@ -3,13 +3,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from './ui/badge';
 import { Code, Terminal, Wifi, Cpu, FileCode, ChevronRight } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 type Category = {
   id: string;
   name: string;
   slug: string;
   description: string;
-  postsCount: number;
   icon: 'code' | 'terminal' | 'wifi' | 'cpu' | 'fileCode';
 };
 
@@ -25,8 +26,40 @@ interface CategoryCardProps {
   category: Category;
 }
 
+// Função para buscar a contagem de posts por categoria
+const fetchPostCount = async (categorySlug: string): Promise<number> => {
+  try {
+    // Verificamos se o slug é "web-app-hacking" (nossa única categoria com posts reais)
+    if (categorySlug === "web-app-hacking") {
+      const { data, error, count } = await supabase
+        .from('posts')
+        .select('*', { count: 'exact' })
+        .eq('category_id', (await supabase.from('categories').select('id').eq('slug', categorySlug).single()).data?.id);
+      
+      if (error) {
+        console.error('Error fetching post count:', error);
+        return 0;
+      }
+      
+      return count || 0;
+    }
+    
+    // Para outras categorias, retornamos 0 pois não há posts
+    return 0;
+  } catch (error) {
+    console.error('Error fetching post count:', error);
+    return 0;
+  }
+};
+
 const CategoryCard = ({ category }: CategoryCardProps) => {
   const IconComponent = iconMap[category.icon];
+
+  // Buscar a contagem de posts para esta categoria
+  const { data: postsCount = 0, isLoading } = useQuery({
+    queryKey: ['category-post-count', category.slug],
+    queryFn: () => fetchPostCount(category.slug)
+  });
 
   return (
     <Link 
@@ -39,7 +72,7 @@ const CategoryCard = ({ category }: CategoryCardProps) => {
             <IconComponent className="h-6 w-6 text-cyber-purple" />
           </div>
           <Badge variant="outline" className="border-cyber-blue/30 text-cyber-blue">
-            {category.postsCount} posts
+            {isLoading ? '...' : `${postsCount} posts`}
           </Badge>
         </div>
         

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -12,82 +13,82 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Search } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
-// Mock Data - filtered to include only posts with substantial content
-const allPosts = [
-  {
-    id: '1',
-    title: 'Como identificar e explorar vulnerabilidades XSS em aplicações web',
-    excerpt: 'Aprenda como identificar, testar e mitigar vulnerabilidades de Cross-Site Scripting (XSS) em aplicações web modernas.',
-    slug: 'como-identificar-xss',
-    coverImage: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
-    category: { name: 'Web App Hacking', slug: 'web-app-hacking' },
-    author: { name: 'Marcos Silva', avatar: '/placeholder.svg' },
-    publishedAt: '12 Fev 2023',
-    readTime: 8
-  },
-  {
-    id: '2',
-    title: 'Guia completo para iniciantes em sistemas Linux',
-    excerpt: 'Um guia passo a passo para quem está começando a usar Linux, com foco em ferramentas para segurança da informação.',
-    slug: 'guia-iniciantes-linux',
-    coverImage: 'https://images.unsplash.com/photo-1567301861629-03a59ece5b67?auto=format&fit=crop&w=800&q=80',
-    category: { name: 'Linux', slug: 'linux' },
-    author: { name: 'Paulo Machado', avatar: '/placeholder.svg' },
-    publishedAt: '05 Mar 2023',
-    readTime: 12
-  },
-  {
-    id: '3',
-    title: 'Introdução ao Capture The Flag (CTF): Como participar e aprender',
-    excerpt: 'Descubra como as competições CTF podem acelerar seu aprendizado em segurança cibernética de forma prática.',
-    slug: 'introducao-ctf',
-    coverImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80',
-    category: { name: 'Introdução a Hacking', slug: 'introducao-hacking' },
-    author: { name: 'Carla Mendes', avatar: '/placeholder.svg' },
-    publishedAt: '20 Jan 2023',
-    readTime: 6
-  },
-  {
-    id: '4',
-    title: 'Análise avançada de pacotes com Wireshark',
-    excerpt: 'Técnicas avançadas para analisar tráfego de rede e identificar atividades suspeitas usando Wireshark.',
-    slug: 'analise-pacotes-wireshark',
-    coverImage: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80',
-    category: { name: 'Redes', slug: 'redes' },
-    author: { name: 'Roberto Alves', avatar: '/placeholder.svg' },
-    publishedAt: '03 Abr 2023',
-    readTime: 10
-  },
-  {
-    id: '5',
-    title: 'Raspberry Pi como ferramenta de pentesting',
-    excerpt: 'Aprenda como transformar um Raspberry Pi em uma poderosa ferramenta de teste de penetração portátil.',
-    slug: 'raspberry-pi-pentesting',
-    coverImage: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=800&q=80',
-    category: { name: 'Hardware Hacking', slug: 'hardware-hacking' },
-    author: { name: 'Ana Souza', avatar: '/placeholder.svg' },
-    publishedAt: '18 Mar 2023',
-    readTime: 15
+// Função para buscar posts do Supabase
+const fetchPosts = async () => {
+  const { data, error } = await supabase
+    .from('posts')
+    .select(`
+      *,
+      categories:category_id (name, slug),
+      profiles:author_id (username, avatar_url)
+    `)
+    .eq('published', true)
+    .order('created_at', { ascending: false });
+  
+  if (error) {
+    console.error('Error fetching posts:', error);
+    throw error;
   }
-];
+  
+  // Mapear os dados para o formato necessário para o PostCard
+  return data.map(post => ({
+    id: post.id,
+    title: post.title,
+    excerpt: post.content ? post.content.substring(0, 150) + '...' : '',
+    slug: post.slug,
+    coverImage: post.thumbnail_url || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
+    category: {
+      name: post.categories?.name || 'Sem categoria',
+      slug: post.categories?.slug || ''
+    },
+    author: {
+      name: post.profiles?.username || 'Autor desconhecido',
+      avatar: post.profiles?.avatar_url || '/placeholder.svg'
+    },
+    publishedAt: new Date(post.created_at).toLocaleDateString('pt-BR'),
+    readTime: Math.ceil(post.content?.length / 1000) || 5 // Estimativa simples: 1000 caracteres = 1 minuto de leitura
+  }));
+};
 
-// Extract unique categories
-const categories = [...new Set(allPosts.map(post => post.category.name))].map(name => {
-  const post = allPosts.find(p => p.category.name === name);
-  return { name, slug: post?.category.slug || '' };
-});
+// Função para buscar categorias do Supabase
+const fetchCategories = async () => {
+  const { data, error } = await supabase
+    .from('categories')
+    .select('name, slug')
+    .order('name');
+  
+  if (error) {
+    console.error('Error fetching categories:', error);
+    throw error;
+  }
+  
+  return data;
+};
 
 const Posts = () => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [selectedCategory, setSelectedCategory] = React.useState('all');
   const [sortBy, setSortBy] = React.useState('recent');
-  const [filteredPosts, setFilteredPosts] = React.useState(allPosts);
 
-  React.useEffect(() => {
-    let result = [...allPosts];
+  // Buscar posts e categorias do Supabase
+  const { data: posts = [], isLoading: loadingPosts } = useQuery({
+    queryKey: ['posts'],
+    queryFn: fetchPosts,
+  });
+  
+  const { data: categories = [], isLoading: loadingCategories } = useQuery({
+    queryKey: ['post-categories'],
+    queryFn: fetchCategories,
+  });
+  
+  // Filtrar e ordenar posts
+  const filteredPosts = React.useMemo(() => {
+    let result = [...posts];
     
-    // Filter by search query
+    // Filtrar por pesquisa
     if (searchQuery) {
       result = result.filter(post => 
         post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -95,22 +96,22 @@ const Posts = () => {
       );
     }
     
-    // Filter by category
+    // Filtrar por categoria
     if (selectedCategory !== 'all') {
       result = result.filter(post => post.category.slug === selectedCategory);
     }
     
-    // Sort results
+    // Ordenar resultados
     if (sortBy === 'recent') {
-      // Assume the posts are already sorted by recent in the mock data
+      // Já ordenado por created_at descendente
     } else if (sortBy === 'oldest') {
       result = [...result].reverse();
     } else if (sortBy === 'readTime') {
       result = [...result].sort((a, b) => a.readTime - b.readTime);
     }
     
-    setFilteredPosts(result);
-  }, [searchQuery, selectedCategory, sortBy]);
+    return result;
+  }, [posts, searchQuery, selectedCategory, sortBy]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -140,7 +141,11 @@ const Posts = () => {
                 />
               </div>
               
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <Select 
+                value={selectedCategory} 
+                onValueChange={setSelectedCategory}
+                disabled={loadingCategories}
+              >
                 <SelectTrigger className="border-cyber-purple/20">
                   <SelectValue placeholder="Filtrar por categoria" />
                 </SelectTrigger>
@@ -186,13 +191,17 @@ const Posts = () => {
           </div>
           
           {/* Posts Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredPosts.map((post) => (
-              <PostCard key={post.id} post={post} />
-            ))}
-          </div>
-          
-          {filteredPosts.length === 0 && (
+          {loadingPosts ? (
+            <div className="text-center py-16">
+              <p className="text-muted-foreground">Carregando posts...</p>
+            </div>
+          ) : filteredPosts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredPosts.map((post) => (
+                <PostCard key={post.id} post={post} />
+              ))}
+            </div>
+          ) : (
             <div className="text-center py-16">
               <h3 className="text-xl font-medium mb-2">Nenhum post encontrado</h3>
               <p className="text-muted-foreground">
