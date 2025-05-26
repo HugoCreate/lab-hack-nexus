@@ -1,0 +1,214 @@
+@startuml Deployment_Diagram
+!theme plain
+skinparam backgroundColor #F8F9FA
+
+title Lab Hack Nexus - Deployment Diagram
+
+!define SERVER_COLOR #E3F2FD
+!define CONTAINER_COLOR #FFF3E0
+!define SERVICE_COLOR #E8F5E8
+
+node "Load Balancer" as lb {
+  component "Nginx Proxy" as nginx_lb {
+    [SSL Termination]
+    [Request Routing]
+    [Rate Limiting]
+  }
+}
+
+node "Production Server" as prod_server SERVER_COLOR {
+  
+  node "Docker Engine" as docker_engine {
+    
+    artifact "Frontend Container" as frontend_container CONTAINER_COLOR {
+      component "React Production Build" as react_build {
+        [Static Assets]
+        [Index.html]
+        [JS Bundles]
+        [CSS Files]
+      }
+      
+      component "Nginx Web Server" as nginx_web {
+        [Static File Serving]
+        [Client-side Routing]
+        [Gzip Compression]
+      }
+      
+      port "3000" as frontend_port
+    }
+    
+    artifact "API Container" as api_container CONTAINER_COLOR {
+      component "FastAPI Application" as fastapi_app {
+        [REST Endpoints]
+        [Authentication Middleware]
+        [Data Validation]
+        [Business Logic]
+      }
+      
+      component "Python Runtime" as python_runtime {
+        [Python 3.9+]
+        [Dependencies]
+        [Environment Variables]
+      }
+      
+      port "8000" as api_port
+    }
+    
+    component "Shared Volumes" as volumes {
+      [Configuration Files]
+      [Logs Directory]
+      [Temp Files]
+    }
+    
+    component "Network Bridge" as docker_network {
+      [Internal Communication]
+      [Service Discovery]
+    }
+  }
+  
+  component "System Resources" as system_resources {
+    [CPU Monitoring]
+    [Memory Management]
+    [Disk Storage]
+    [Network Interface]
+  }
+}
+
+cloud "Supabase Cloud" as supabase_cloud SERVICE_COLOR {
+  
+  component "Database Cluster" as db_cluster {
+    database "Primary PostgreSQL" as primary_db {
+      [Read/Write Operations]
+      [ACID Transactions]
+      [Row Level Security]
+    }
+    
+    database "Read Replicas" as read_replicas {
+      [Read Operations]
+      [Load Distribution]
+      [Backup Queries]
+    }
+  }
+  
+  component "Authentication Service" as auth_service {
+    [JWT Token Management]
+    [User Registration]
+    [Password Management]
+    [OAuth Integration]
+  }
+  
+  component "Storage Cluster" as storage_cluster {
+    [File Upload API]
+    [Bucket Management]
+    [CDN Distribution]
+    [Access Control]
+  }
+  
+  component "Real-time Engine" as realtime_engine {
+    [WebSocket Connections]
+    [Change Data Capture]
+    [Live Subscriptions]
+  }
+  
+  component "Edge Network" as edge_network {
+    [Global Distribution]
+    [Caching Layer]
+    [DDoS Protection]
+  }
+}
+
+cloud "External Services" as external_services {
+  
+  component "CDN Provider" as cdn_provider {
+    [Static Asset Caching]
+    [Global Edge Locations]
+    [Image Optimization]
+  }
+  
+  component "Email Service" as email_service {
+    [SMTP Server]
+    [Email Templates]
+    [Delivery Tracking]
+  }
+  
+  component "Monitoring Services" as monitoring {
+    [Application Monitoring]
+    [Error Tracking]
+    [Performance Analytics]
+  }
+  
+  component "DNS Provider" as dns_provider {
+    [Domain Management]
+    [SSL Certificate]
+    [Health Checks]
+  }
+}
+
+device "User Devices" as user_devices {
+  [Desktop Browsers]
+  [Mobile Browsers]
+  [Tablet Browsers]
+}
+
+' Network Connections
+user_devices --> lb : "HTTPS (443)"
+lb --> nginx_web : "HTTP (3000)"
+lb --> fastapi_app : "HTTP (8000)"
+
+nginx_web --> docker_network
+fastapi_app --> docker_network
+
+fastapi_app --> auth_service : "HTTPS API"
+fastapi_app --> primary_db : "PostgreSQL Protocol"
+fastapi_app --> storage_cluster : "REST API"
+
+nginx_web --> realtime_engine : "WebSocket"
+primary_db --> read_replicas : "Replication"
+
+storage_cluster --> cdn_provider : "Asset Distribution"
+fastapi_app --> email_service : "SMTP"
+prod_server --> monitoring : "Metrics & Logs"
+
+dns_provider --> lb : "DNS Resolution"
+edge_network --> user_devices : "Cached Content"
+
+' Container Dependencies
+frontend_container --> volumes
+api_container --> volumes
+docker_engine --> system_resources
+
+note right of lb
+  Load Balancer Configuration:
+  - SSL/TLS certificates
+  - Health check endpoints
+  - Failover mechanisms
+  - Request logging
+end note
+
+note left of docker_engine
+  Container Orchestration:
+  - Docker Compose
+  - Service dependencies
+  - Resource limits
+  - Restart policies
+  - Environment isolation
+end note
+
+note bottom of supabase_cloud
+  Managed Infrastructure:
+  - Automatic scaling
+  - High availability
+  - Disaster recovery
+  - Security patches
+  - Performance optimization
+end note
+
+note top of external_services
+  Third-party Integrations:
+  - SLA agreements
+  - API rate limits
+  - Security credentials
+  - Monitoring dashboards
+end note
+
+@enduml

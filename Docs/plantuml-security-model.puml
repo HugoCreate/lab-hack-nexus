@@ -1,0 +1,252 @@
+@startuml Security_Model
+!theme plain
+skinparam backgroundColor #F8F9FA
+
+title Lab Hack Nexus - Security Model
+
+!define SECURE_COLOR #10B981
+!define RISK_COLOR #EF4444
+!define WARNING_COLOR #F59E0B
+!define INFO_COLOR #3B82F6
+
+package "Frontend Security" as frontend_security {
+  
+  component "Client-side Protection" as client_protection SECURE_COLOR {
+    [Input Validation]
+    [XSS Prevention]
+    [CSRF Protection]
+    [Content Security Policy]
+    [Secure Cookies]
+  }
+  
+  component "Authentication" as frontend_auth INFO_COLOR {
+    [JWT Token Storage]
+    [Automatic Logout]
+    [Session Management]
+    [Redirect Protection]
+  }
+  
+  component "Data Validation" as frontend_validation WARNING_COLOR {
+    [Form Validation (Zod)]
+    [Type Safety (TypeScript)]
+    [Sanitization]
+    [File Upload Validation]
+  }
+}
+
+package "Network Security" as network_security {
+  
+  component "Transport Layer" as transport_security SECURE_COLOR {
+    [HTTPS Enforcement]
+    [TLS 1.3]
+    [Certificate Pinning]
+    [HSTS Headers]
+  }
+  
+  component "API Security" as api_security INFO_COLOR {
+    [Rate Limiting]
+    [Request Size Limits]
+    [CORS Configuration]
+    [API Versioning]
+  }
+  
+  component "Network Monitoring" as network_monitoring WARNING_COLOR {
+    [DDoS Protection]
+    [Traffic Analysis]
+    [Intrusion Detection]
+    [Firewall Rules]
+  }
+}
+
+package "Backend Security" as backend_security {
+  
+  component "Authentication & Authorization" as backend_auth SECURE_COLOR {
+    [JWT Validation]
+    [Role-based Access Control]
+    [Permission Checking]
+    [Session Invalidation]
+  }
+  
+  component "Data Protection" as data_protection INFO_COLOR {
+    [Input Sanitization]
+    [SQL Injection Prevention]
+    [Parameter Validation]
+    [Output Encoding]
+  }
+  
+  component "API Endpoint Security" as endpoint_security WARNING_COLOR {
+    [Authentication Middleware]
+    [Request Logging]
+    [Error Handling]
+    [Response Filtering]
+  }
+}
+
+package "Database Security" as database_security {
+  
+  component "Access Control" as db_access_control SECURE_COLOR {
+    [Row Level Security (RLS)]
+    [User Permissions]
+    [Database Roles]
+    [Connection Pooling]
+  }
+  
+  component "Data Encryption" as data_encryption INFO_COLOR {
+    [Encryption at Rest]
+    [Encryption in Transit]
+    [Key Management]
+    [Backup Encryption]
+  }
+  
+  component "Audit & Monitoring" as db_monitoring WARNING_COLOR {
+    [Query Logging]
+    [Access Monitoring]
+    [Change Tracking]
+    [Anomaly Detection]
+  }
+}
+
+package "File Storage Security" as storage_security {
+  
+  component "Upload Security" as upload_security SECURE_COLOR {
+    [File Type Validation]
+    [Size Limitations]
+    [Virus Scanning]
+    [Content Inspection]
+  }
+  
+  component "Access Control" as storage_access INFO_COLOR {
+    [Bucket Policies]
+    [Signed URLs]
+    [Time-based Access]
+    [User-based Permissions]
+  }
+  
+  component "Content Delivery" as content_delivery WARNING_COLOR {
+    [CDN Security]
+    [Cache Validation]
+    [Content Filtering]
+    [Geographic Restrictions]
+  }
+}
+
+package "Infrastructure Security" as infra_security {
+  
+  component "Container Security" as container_security SECURE_COLOR {
+    [Image Scanning]
+    [Runtime Protection]
+    [Resource Limits]
+    [Network Isolation]
+  }
+  
+  component "Server Security" as server_security INFO_COLOR {
+    [OS Hardening]
+    [Security Updates]
+    [Service Configuration]
+    [Port Management]
+  }
+  
+  component "Monitoring & Logging" as infra_monitoring WARNING_COLOR {
+    [Security Event Logging]
+    [Real-time Alerts]
+    [Compliance Monitoring]
+    [Incident Response]
+  }
+}
+
+package "Compliance & Privacy" as compliance {
+  
+  component "Data Privacy" as data_privacy SECURE_COLOR {
+    [GDPR Compliance]
+    [Data Minimization]
+    [Right to Deletion]
+    [Privacy Policies]
+  }
+  
+  component "Security Policies" as security_policies INFO_COLOR {
+    [Password Policies]
+    [Access Policies]
+    [Retention Policies]
+    [Incident Procedures]
+  }
+  
+  component "Regular Audits" as security_audits WARNING_COLOR {
+    [Security Assessments]
+    [Penetration Testing]
+    [Code Reviews]
+    [Vulnerability Scanning]
+  }
+}
+
+' Security Flow Connections
+client_protection --> transport_security : "Secure Channel"
+frontend_auth --> backend_auth : "Token Validation"
+frontend_validation --> data_protection : "Double Validation"
+
+transport_security --> api_security : "Protected API"
+api_security --> endpoint_security : "Request Processing"
+
+backend_auth --> db_access_control : "Database Access"
+data_protection --> data_encryption : "Secure Storage"
+endpoint_security --> db_monitoring : "Activity Logging"
+
+upload_security --> storage_access : "Controlled Upload"
+storage_access --> content_delivery : "Secure Distribution"
+
+container_security --> server_security : "Host Protection"
+server_security --> infra_monitoring : "System Monitoring"
+
+data_privacy --> security_policies : "Policy Enforcement"
+security_policies --> security_audits : "Compliance Verification"
+
+' Risk Indicators
+note right of client_protection
+  🔒 Critical Security Layer
+  - First line of defense
+  - User data protection
+  - Prevents common attacks
+end note
+
+note left of backend_auth
+  🛡️ Core Security Component
+  - Central authentication
+  - Authorization control
+  - Session management
+end note
+
+note bottom of db_access_control
+  🔐 Data Protection Core
+  - Row-level security
+  - Fine-grained permissions
+  - Audit trail
+end note
+
+note top of upload_security
+  ⚠️ High Risk Area
+  - File upload vectors
+  - Malware potential
+  - Content validation needed
+end note
+
+' Security Threats
+package "Security Threats" as threats RISK_COLOR {
+  [SQL Injection]
+  [XSS Attacks]
+  [CSRF Attacks]
+  [DDoS Attacks]
+  [Data Breaches]
+  [Malware Upload]
+  [Session Hijacking]
+  [Privilege Escalation]
+}
+
+' Threat Mitigation
+data_protection ..> threats : "Prevents SQL Injection"
+client_protection ..> threats : "Prevents XSS & CSRF"
+network_monitoring ..> threats : "Detects DDoS"
+data_encryption ..> threats : "Mitigates Data Breaches"
+upload_security ..> threats : "Prevents Malware"
+backend_auth ..> threats : "Prevents Session Hijacking"
+db_access_control ..> threats : "Prevents Privilege Escalation"
+
+@enduml

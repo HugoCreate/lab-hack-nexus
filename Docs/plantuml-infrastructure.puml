@@ -1,0 +1,156 @@
+@startuml Infrastructure_Diagram
+!theme plain
+skinparam backgroundColor #F8F9FA
+
+title Lab Hack Nexus - Infrastructure Diagram
+
+!define RECTANGLE_COLOR #E3F2FD
+!define CLOUD_COLOR #FFF3E0
+!define DATABASE_COLOR #E8F5E8
+
+package "Development Environment" as dev_env {
+  
+  node "Developer Machine" as dev_machine {
+    [VS Code]
+    [Git]
+    [Node.js]
+    [Python]
+    [Docker Desktop]
+  }
+  
+  cloud "Version Control" as vc {
+    [GitHub Repository]
+    [GitHub Actions CI/CD]
+  }
+}
+
+package "Production Environment" as prod_env {
+  
+  node "Docker Host" as docker_host {
+    container "Frontend Container" as frontend_container {
+      [React App (Vite Build)]
+      [Nginx Server]
+      port "80/443" as frontend_port
+    }
+    
+    container "API Container" as api_container {
+      [FastAPI Server]
+      [Python Runtime]
+      port "8000" as api_port
+    }
+    
+    container "Reverse Proxy" as nginx_proxy {
+      [Nginx Proxy]
+      [SSL Termination]
+      [Load Balancer]
+      port "80/443" as proxy_port
+    }
+  }
+  
+  cloud "Supabase Platform" as supabase_cloud CLOUD_COLOR {
+    database "PostgreSQL" as db DATABASE_COLOR {
+      [User Data]
+      [Posts & Comments]
+      [Categories]
+      [Website Content]
+    }
+    
+    component "Authentication Service" as auth_service {
+      [JWT Management]
+      [User Sessions]
+      [OAuth Providers]
+    }
+    
+    component "Storage Service" as storage_service {
+      [File Upload API]
+      [CDN Distribution]
+      [Bucket Management]
+    }
+    
+    component "Real-time Service" as realtime_service {
+      [WebSocket Server]
+      [Live Updates]
+      [Subscriptions]
+    }
+    
+    component "Edge Functions" as edge_functions {
+      [Server-side Logic]
+      [Triggers]
+      [Webhooks]
+    }
+  }
+  
+  cloud "External Services" as external_services CLOUD_COLOR {
+    [Email Service]
+    [CDN (CloudFlare)]
+    [DNS Management]
+    [SSL Certificates]
+    [Monitoring Services]
+  }
+}
+
+package "User Access" as user_access {
+  actor "Web Users" as web_users
+  actor "Mobile Users" as mobile_users
+  actor "Administrators" as admins
+}
+
+' Network Connections
+web_users --> proxy_port : "HTTPS"
+mobile_users --> proxy_port : "HTTPS"
+admins --> proxy_port : "HTTPS"
+
+nginx_proxy --> frontend_port : "Internal"
+nginx_proxy --> api_port : "Internal"
+
+frontend_container --> supabase_cloud : "HTTPS API Calls"
+api_container --> db : "Database Queries"
+api_container --> auth_service : "Auth Validation"
+api_container --> storage_service : "File Operations"
+
+realtime_service --> frontend_container : "WebSocket"
+external_services --> supabase_cloud : "Integrations"
+
+dev_machine --> vc : "Git Push"
+vc --> docker_host : "Deploy"
+
+' Storage Relationships
+storage_service --> external_services : "CDN Distribution"
+
+note right of docker_host
+  Container Orchestration:
+  - Docker Compose
+  - Health Checks
+  - Auto-restart
+  - Resource Limits
+  - Environment Variables
+end note
+
+note left of supabase_cloud
+  Managed Services:
+  - Automatic Backups
+  - High Availability
+  - Scaling
+  - Security Updates
+  - Global Edge Network
+end note
+
+note bottom of nginx_proxy
+  Reverse Proxy Features:
+  - SSL/TLS Termination
+  - Request Routing
+  - Rate Limiting
+  - Static File Serving
+  - Gzip Compression
+end note
+
+note top of vc
+  CI/CD Pipeline:
+  - Automated Testing
+  - Build Process
+  - Docker Image Creation
+  - Deployment
+  - Rollback Capability
+end note
+
+@enduml

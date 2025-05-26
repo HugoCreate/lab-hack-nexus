@@ -1,0 +1,136 @@
+@startuml System_Architecture
+!theme plain
+skinparam backgroundColor #F8F9FA
+
+title Lab Hack Nexus - System Architecture
+
+package "Frontend (React)" as frontend {
+  component "React App" as react_app {
+    [Pages]
+    [Components]
+    [Contexts]
+    [Hooks]
+  }
+  
+  component "UI Libraries" as ui_libs {
+    [TailwindCSS]
+    [shadcn/ui]
+    [Lucide Icons]
+  }
+  
+  component "State Management" as state_mgmt {
+    [React Query]
+    [Context API]
+    [React Hook Form]
+  }
+  
+  component "Routing" as routing {
+    [React Router DOM]
+  }
+}
+
+package "Backend Services" as backend {
+  component "FastAPI Server" as fastapi {
+    [Authentication Middleware]
+    [API Routes]
+    [Data Models]
+    [Business Logic]
+  }
+  
+  component "Supabase BaaS" as supabase {
+    database "PostgreSQL" as postgres {
+      [User Data]
+      [Posts]
+      [Comments]
+      [Categories]
+    }
+    
+    component "Supabase Auth" as auth {
+      [JWT Tokens]
+      [User Management]
+      [Row Level Security]
+    }
+    
+    component "Supabase Storage" as storage {
+      [Avatars Bucket]
+      [Thumbnails Bucket]
+      [File Upload API]
+    }
+    
+    component "Real-time" as realtime {
+      [WebSocket Connections]
+      [Live Updates]
+    }
+  }
+}
+
+package "Infrastructure" as infra {
+  component "Docker" as docker {
+    [Frontend Container]
+    [API Container]
+    [Nginx Proxy]
+  }
+  
+  component "Deployment" as deploy {
+    [Docker Compose]
+    [Environment Config]
+    [SSL/TLS]
+  }
+}
+
+cloud "External Services" as external {
+  [CDN]
+  [Email Service]
+  [Analytics]
+}
+
+' User interactions
+actor "User" as user
+actor "Admin" as admin
+
+' Connections
+user --> react_app : "HTTP/HTTPS"
+admin --> react_app : "HTTP/HTTPS"
+
+react_app --> fastapi : "REST API"
+react_app --> supabase : "Direct Client"
+
+fastapi --> postgres : "Database Queries"
+fastapi --> auth : "Auth Validation"
+fastapi --> storage : "File Operations"
+
+postgres --> auth : "RLS Policies"
+realtime --> react_app : "WebSocket"
+
+docker --> react_app
+docker --> fastapi
+deploy --> docker
+
+react_app --> external : "Optional Services"
+
+note right of react_app
+  SPA (Single Page Application)
+  - Vite build tool
+  - TypeScript
+  - Responsive design
+  - PWA ready
+end note
+
+note left of fastapi
+  REST API Server
+  - Python 3.9+
+  - Async/await
+  - Pydantic validation
+  - JWT authentication
+end note
+
+note bottom of supabase
+  Backend as a Service
+  - Managed PostgreSQL
+  - Real-time subscriptions
+  - Built-in authentication
+  - File storage with CDN
+  - Row Level Security
+end note
+
+@enduml

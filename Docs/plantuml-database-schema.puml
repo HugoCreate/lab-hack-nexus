@@ -1,0 +1,108 @@
+@startuml Database_Schema
+!theme plain
+skinparam backgroundColor #F8F9FA
+skinparam componentStyle rectangle
+
+title Lab Hack Nexus - Database Schema
+
+entity "profiles" as profiles {
+  * id : string <<PK>>
+  --
+  * username : string <<unique>>
+  avatar_url : string
+  bio : string
+  is_admin : boolean = false
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "categories" as categories {
+  * id : string <<PK>>
+  --
+  * name : string
+  * slug : string <<unique>>
+  description : string
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "posts" as posts {
+  * id : string <<PK>>
+  --
+  * title : string
+  * content : text
+  * slug : string <<unique>>
+  * author_id : string <<FK>>
+  category_id : string <<FK>>
+  published : boolean = false
+  thumbnail_url : string
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "comments" as comments {
+  * id : string <<PK>>
+  --
+  * content : text
+  * post_id : string <<FK>>
+  * user_id : string <<FK>>
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "saved_posts" as saved_posts {
+  * id : string <<PK>>
+  --
+  * post_id : string <<FK>>
+  * user_id : string <<FK>>
+  created_at : timestamp
+}
+
+entity "website_content" as website_content {
+  * id : string <<PK>>
+  --
+  * page_name : string
+  * content : json
+  * updated_by : string <<FK>>
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+' Storage Buckets
+cloud "Storage Buckets" as storage {
+  folder "avatars" as avatars_bucket
+  folder "post-thumbnails" as thumbnails_bucket
+}
+
+' Relationships
+profiles ||--o{ posts : "author_id"
+categories ||--o{ posts : "category_id"
+posts ||--o{ comments : "post_id"
+profiles ||--o{ comments : "user_id"
+posts ||--o{ saved_posts : "post_id"
+profiles ||--o{ saved_posts : "user_id"
+profiles ||--o{ website_content : "updated_by"
+
+' Storage relationships (visual only)
+profiles ..> avatars_bucket : "stores avatar"
+posts ..> thumbnails_bucket : "stores thumbnail"
+
+note right of profiles
+  - Contém informações do perfil do usuário
+  - is_admin define permissões especiais
+  - username deve ser único
+end note
+
+note left of posts
+  - published controla visibilidade
+  - slug usado para URLs amigáveis
+  - thumbnail_url aponta para Supabase Storage
+end note
+
+note bottom of storage
+  Supabase Storage Buckets:
+  - Políticas RLS aplicadas
+  - URLs públicas geradas automaticamente
+end note
+
+@enduml

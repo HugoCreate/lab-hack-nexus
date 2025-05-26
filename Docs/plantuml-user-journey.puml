@@ -1,0 +1,142 @@
+@startuml User_Journey
+!theme plain
+skinparam backgroundColor #F8F9FA
+
+title Lab Hack Nexus - User Journey Flow
+
+|Visitante|
+start
+:Acessa site;
+:Visualiza página inicial;
+
+if (Deseja ver posts?) then (sim)
+  :Lista posts públicos;
+  :Visualiza post específico;
+  :Vê comentários;
+  
+  if (Quer interagir?) then (sim)
+    :Clica em "Login";
+    |#AntiqueWhite|Autenticação|
+  else (não)
+    |Visitante|
+    :Continua navegando;
+  endif
+else (não)
+  :Navega pelo site;
+endif
+
+|#AntiqueWhite|Autenticação|
+:Página de login;
+
+if (Tem conta?) then (sim)
+  :Insere email/senha;
+  :Clica "Entrar";
+  
+  if (Credenciais válidas?) then (sim)
+    |#LightBlue|Usuário Logado|
+    :Login realizado;
+  else (não)
+    :Exibe erro;
+    :Tenta novamente;
+    stop
+  endif
+else (não)
+  :Clica "Registrar";
+  :Preenche formulário;
+  :Aceita termos;
+  :Clica "Criar conta";
+    if (Dados válidos?) then (sim)
+    :Conta criada;
+    :Email de verificação;
+    :Redirecionado para login;
+    |#AntiqueWhite|Autenticação|
+  else (não)
+    :Exibe erros;
+    :Corrige formulário;
+    repeat :Tenta novamente;
+    repeat while (Dados válidos?) is (não)
+  endif
+endif
+
+|#LightBlue|Usuário Logado|
+:Dashboard personalizado;
+
+fork
+  :Criar novo post;
+  :Preenche título/conteúdo;
+  :Seleciona categoria;
+  :Upload thumbnail (opcional);
+  :Publica ou salva rascunho;
+  :Post criado;
+fork again
+  :Comentar em posts;
+  :Escreve comentário;
+  :Submete comentário;
+  :Comentário publicado;
+fork again
+  :Salvar posts favoritos;
+  :Clica em "Salvar";
+  :Post adicionado aos favoritos;
+fork again
+  :Gerenciar perfil;
+  :Acessa configurações;
+  :Atualiza informações;
+  :Upload avatar;
+  :Salva alterações;
+fork again
+  :Visualizar meus posts;
+  :Lista posts próprios;
+  :Edita ou exclui posts;
+end fork
+
+if (É administrador?) then (sim)
+  |#LightCoral|Admin|
+  :Acessa painel admin;
+  
+  fork
+    :Moderar comentários;
+    :Aprovar/remover conteúdo;
+  fork again
+    :Gerenciar categorias;
+    :Criar/editar categorias;
+  fork again
+    :Editar conteúdo do site;
+    :Atualizar páginas estáticas;
+  fork again
+    :Visualizar relatórios;
+    :Estatísticas de uso;
+  end fork
+  
+  |#LightBlue|Usuário Logado|
+else (não)
+  :Continua como usuário;
+endif
+
+:Logout (opcional);
+|Visitante|
+stop
+
+note right of start
+  Fluxo principal do usuário
+  desde visitante até usuário
+  ativo da plataforma
+end note
+
+note left of "Dashboard personalizado"
+  Usuário autenticado tem acesso a:
+  - Criar posts
+  - Comentar
+  - Salvar favoritos
+  - Gerenciar perfil
+  - Ver posts salvos
+end note
+
+note right of "Acessa painel admin"
+  Funcionalidades administrativas:
+  - Moderação de conteúdo
+  - Gestão de categorias
+  - Edição de páginas
+  - Relatórios e analytics
+end note
+
+@enduml

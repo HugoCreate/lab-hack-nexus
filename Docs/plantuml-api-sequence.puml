@@ -1,0 +1,66 @@
+@startuml API_Sequence
+!theme plain
+skinparam backgroundColor #F8F9FA
+
+title Lab Hack Nexus - API Sequence Diagram (Post Creation)
+
+actor "User" as user
+participant "React App" as frontend
+participant "Auth Context" as auth_context
+participant "FastAPI" as api
+participant "Supabase Auth" as supabase_auth
+participant "PostgreSQL" as database
+participant "Supabase Storage" as storage
+
+== Authentication Check ==
+user -> frontend : Navigate to /create-post
+frontend -> auth_context : Check authentication
+auth_context -> supabase_auth : Validate JWT token
+supabase_auth --> auth_context : Token valid
+auth_context --> frontend : User authenticated
+frontend --> user : Show create post form
+
+== Post Creation ==
+user -> frontend : Fill form (title, content, category)
+user -> frontend : Upload thumbnail image
+frontend -> frontend : Validate form data
+
+alt Thumbnail uploaded
+  frontend -> storage : Upload image to post-thumbnails bucket
+  storage -> storage : Apply RLS policies
+  storage --> frontend : Return public URL
+end
+
+frontend -> api : POST /posts (with auth header)
+api -> supabase_auth : Validate JWT token
+supabase_auth --> api : Token valid, return user ID
+
+api -> api : Validate request data (Pydantic)
+api -> database : INSERT post record
+note right : Uses authenticated user ID as author_id
+
+alt Post creation successful
+  database --> api : Return created post
+  api --> frontend : 201 Created + post data
+  frontend -> frontend : Show success toast
+  frontend -> frontend : Navigate to new post
+  frontend --> user : Show created post
+else Post creation failed
+  database --> api : Error response
+  api --> frontend : 400/500 Error
+  frontend -> frontend : Show error toast
+  frontend --> user : Display error message
+end
+
+== Real-time Update ==
+database -> supabase_auth : Trigger real-time event
+supabase_auth -> frontend : WebSocket notification (optional)
+frontend -> frontend : Update post list cache
+
+note over user, database
+  This sequence shows the complete flow
+  of creating a new post with image upload,
+  authentication validation, and error handling
+end note
+
+@enduml

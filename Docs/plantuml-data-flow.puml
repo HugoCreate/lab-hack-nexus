@@ -1,0 +1,158 @@
+@startuml Data_Flow_Diagram
+!theme plain
+skinparam backgroundColor #F8F9FA
+
+title Lab Hack Nexus - Data Flow Diagram
+
+!define PRIMARY_COLOR #2563EB
+!define SECONDARY_COLOR #10B981
+!define WARNING_COLOR #F59E0B
+!define DANGER_COLOR #EF4444
+
+entity "User Interface" as ui {
+  [Login Form]
+  [Post Editor]
+  [Comment Section]
+  [Profile Settings]
+  [Admin Panel]
+}
+
+process "Authentication Layer" as auth_layer PRIMARY_COLOR {
+  1. Validate Credentials
+  2. Generate JWT Token
+  3. Manage Sessions
+  4. Check Permissions
+}
+
+process "API Gateway" as api_gateway SECONDARY_COLOR {
+  1. Route Requests
+  2. Validate Tokens
+  3. Rate Limiting
+  4. Request Logging
+}
+
+process "Business Logic" as business_logic WARNING_COLOR {
+  1. Post Management
+  2. Comment Processing
+  3. User Management
+  4. Content Moderation
+  5. File Processing
+}
+
+datastore "Database" as database {
+  D1. Users & Profiles
+  D2. Posts & Content
+  D3. Comments
+  D4. Categories
+  D5. Saved Posts
+  D6. Website Content
+}
+
+datastore "File Storage" as file_storage {
+  F1. User Avatars
+  F2. Post Thumbnails
+  F3. Static Assets
+}
+
+datastore "Cache Layer" as cache_layer {
+  C1. Session Data
+  C2. Frequent Queries
+  C3. Static Content
+}
+
+external_entity "Email Service" as email_service DANGER_COLOR
+external_entity "CDN" as cdn
+external_entity "Analytics" as analytics
+
+' Data Flows - Authentication
+ui --> auth_layer : "1. Login/Register\nCredentials"
+auth_layer --> database : "2. Validate User\nCredentials"
+database --> auth_layer : "3. User Data"
+auth_layer --> ui : "4. JWT Token\n& User Info"
+
+' Data Flows - Content Creation
+ui --> api_gateway : "5. Create Post\n(with JWT)"
+api_gateway --> auth_layer : "6. Validate Token"
+auth_layer --> api_gateway : "7. User Authorized"
+api_gateway --> business_logic : "8. Process Post\nData"
+business_logic --> database : "9. Store Post\nData"
+business_logic --> file_storage : "10. Upload\nThumbnail"
+file_storage --> business_logic : "11. File URL"
+business_logic --> api_gateway : "12. Post Created\nResponse"
+api_gateway --> ui : "13. Success\nConfirmation"
+
+' Data Flows - Content Retrieval
+ui --> api_gateway : "14. Request Posts"
+api_gateway --> cache_layer : "15. Check Cache"
+cache_layer --> api_gateway : "16. Cache Miss"
+api_gateway --> business_logic : "17. Get Posts"
+business_logic --> database : "18. Query Posts"
+database --> business_logic : "19. Posts Data"
+business_logic --> cache_layer : "20. Cache Results"
+business_logic --> api_gateway : "21. Posts Response"
+api_gateway --> ui : "22. Display Posts"
+
+' Data Flows - Comments
+ui --> api_gateway : "23. Add Comment"
+api_gateway --> business_logic : "24. Process Comment"
+business_logic --> database : "25. Store Comment"
+database --> business_logic : "26. Comment Saved"
+business_logic --> ui : "27. Real-time Update\n(WebSocket)"
+
+' Data Flows - File Management
+ui --> api_gateway : "28. Upload Avatar"
+api_gateway --> business_logic : "29. Process Upload"
+business_logic --> file_storage : "30. Store File"
+file_storage --> cdn : "31. Distribute\nto CDN"
+file_storage --> business_logic : "32. Public URL"
+business_logic --> database : "33. Update Profile\nwith URL"
+
+' Data Flows - Admin Operations
+ui --> api_gateway : "34. Admin Actions"
+api_gateway --> auth_layer : "35. Check Admin\nPermissions"
+auth_layer --> api_gateway : "36. Admin Verified"
+api_gateway --> business_logic : "37. Execute Admin\nOperation"
+business_logic --> database : "38. Update Content/\nUser Data"
+
+' Data Flows - Notifications
+business_logic --> email_service : "39. Send Email\nNotifications"
+business_logic --> analytics : "40. Track Events"
+
+' Data Flows - Performance
+cdn --> ui : "41. Cached Static\nAssets"
+cache_layer --> api_gateway : "42. Cached API\nResponses"
+
+note right of auth_layer
+  Authentication Flow:
+  - JWT token validation
+  - Role-based access control
+  - Session management
+  - Password hashing
+end note
+
+note left of business_logic
+  Core Business Rules:
+  - Content validation
+  - Spam detection
+  - File size limits
+  - User permissions
+  - Data sanitization
+end note
+
+note bottom of database
+  Data Persistence:
+  - ACID transactions
+  - Row Level Security
+  - Automated backups
+  - Real-time subscriptions
+end note
+
+note top of file_storage
+  File Management:
+  - Multiple bucket support
+  - Automatic compression
+  - CDN integration
+  - Access control policies
+end note
+
+@enduml

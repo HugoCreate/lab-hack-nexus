@@ -1,0 +1,149 @@
+@startuml Authentication_Flow
+!theme plain
+skinparam backgroundColor #F8F9FA
+
+title Lab Hack Nexus - Authentication Flow
+
+|#AntiqueWhite|User|
+start
+:Access application;
+
+if (Is authenticated?) then (yes)
+  |#LightBlue|Authenticated User|
+  :Access protected features;
+  :Create posts;
+  :Comment;
+  :Save posts;
+  stop
+else (no)
+  :View public content only;
+endif
+
+:Click Login/Register;
+
+|#LightCoral|Authentication Process|
+
+if (Has account?) then (yes)
+  :Go to Login page;
+  :Enter email/password;
+  :Submit login form;
+  
+  -> Supabase Auth;
+  :Validate credentials;
+  
+  if (Valid credentials?) then (yes)
+    :Generate JWT token;
+    :Create session;
+    -> Frontend;
+    :Store auth state;
+    :Update AuthContext;
+    :Show success toast;
+    |#LightBlue|Authenticated User|
+    :Redirect to dashboard;
+  else (no)
+    -> Frontend;
+    :Show error message;
+    :Return to login form;
+    |#LightCoral|Authentication Process|
+    stop
+  endif
+  
+else (no)
+  :Go to Register page;
+  :Fill registration form;
+  :Accept terms & conditions;
+  :Submit registration;
+  
+  -> Supabase Auth;
+  :Create new user;
+  :Send verification email;
+  
+  if (Registration successful?) then (yes)
+    -> Database;
+    :Create user profile;
+    :Set default permissions;
+    -> Frontend;
+    :Show success message;
+    :Redirect to login;
+    |#LightCoral|Authentication Process|
+  else (no)
+    -> Frontend;
+    :Show validation errors;
+    :Return to registration form;
+    stop
+  endif
+endif
+
+|#LightBlue|Authenticated User|
+
+:Access protected routes;
+
+fork
+  :Create new post;
+  :Upload images;
+  :Publish content;
+fork again
+  :View saved posts;
+  :Manage favorites;
+fork again
+  :Edit profile;
+  :Update avatar;
+  :Change settings;
+fork again
+  :Comment on posts;
+  :Interact with community;
+end fork
+
+if (Is admin user?) then (yes)
+  |#Yellow|Admin Features|
+  :Access admin dashboard;
+  :Moderate content;
+  :Manage categories;
+  :Edit website content;
+  |#LightBlue|Authenticated User|
+else (no)
+  :Continue as regular user;
+endif
+
+:Logout (optional);
+
+-> Supabase Auth;
+:Destroy session;
+:Clear JWT token;
+
+-> Frontend;
+:Clear auth state;
+:Update AuthContext;
+:Show logout message;
+
+|#AntiqueWhite|User|
+:Return to public view;
+stop
+
+note right of "Generate JWT token"
+  JWT Token contains:
+  - User ID
+  - Email
+  - Role/permissions
+  - Expiration time
+  - Signature
+end note
+
+note left of "Create user profile"
+  Profile includes:
+  - Username
+  - Avatar URL
+  - Bio
+  - Admin flag
+  - Timestamps
+end note
+
+note bottom of "Access admin dashboard"
+  Admin capabilities:
+  - Content moderation
+  - User management
+  - Site configuration
+  - Analytics
+end note
+
+@enduml

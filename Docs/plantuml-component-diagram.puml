@@ -1,0 +1,182 @@
+@startuml Component_Diagram
+!theme plain
+skinparam backgroundColor #F8F9FA
+
+title Lab Hack Nexus - Component Diagram
+
+package "Frontend Application" {
+  
+  package "Pages" as pages {
+    [Index]
+    [Posts]
+    [PostPage]
+    [Categories]
+    [CategoryPage]
+    [Login]
+    [Register]
+    [AccountSettings]
+    [CreatePost]
+    [UserPosts]
+    [AdminDashboard]
+    [SavedPosts]
+    [NotFound]
+  }
+  
+  package "Components" as components {
+    [Navbar]
+    [Footer]
+    [PostCard]
+    [CategoryCard]
+    [CommentSection]
+    [CreatePostForm]
+    [WebsiteEditor]
+    [SharePost]
+    [ThemeToggle]
+    [HeroSection]
+  }
+  
+  package "UI Components" as ui_components {
+    [Button]
+    [Input]
+    [Card]
+    [Dialog]
+    [DropdownMenu]
+    [Form]
+    [Avatar]
+    [Badge]
+    [Table]
+    [Tabs]
+  }
+  
+  package "Contexts" as contexts {
+    [AuthContext]
+    [ThemeContext]
+  }
+  
+  package "Hooks" as hooks {
+    [useSavedPosts]
+    [useToast]
+    [useMobile]
+  }
+  
+  package "Integrations" as integrations {
+    [Supabase Client]
+    [Types]
+  }
+  
+  package "Utils" as utils {
+    [Utilities]
+    [Constants]
+  }
+}
+
+package "Backend API" {
+  
+  package "FastAPI Routes" as api_routes {
+    [Auth Routes]
+    [Posts Routes]
+    [Comments Routes]
+    [Categories Routes]
+    [Profiles Routes]
+    [Saved Posts Routes]
+    [Website Content Routes]
+  }
+  
+  package "Models" as api_models {
+    [User Models]
+    [Post Models]
+    [Comment Models]
+    [Category Models]
+    [Profile Models]
+    [WebsiteContent Models]
+  }
+  
+  package "Database" as database {
+    [Supabase Connection]
+    [Admin Client]
+    [Regular Client]
+  }
+}
+
+package "External Services" {
+  [Supabase Auth]
+  [Supabase Database]
+  [Supabase Storage]
+  [Supabase Realtime]
+}
+
+' Page to Component relationships
+pages --> components : uses
+pages --> contexts : consumes
+pages --> hooks : uses
+pages --> integrations : calls
+
+' Component relationships
+components --> ui_components : composed of
+components --> hooks : uses
+components --> contexts : consumes
+
+' Context relationships
+contexts --> integrations : calls
+contexts --> hooks : provides
+
+' Hook relationships
+hooks --> integrations : calls
+
+' Integration relationships
+integrations --> [Supabase Auth] : authenticates
+integrations --> [Supabase Database] : queries
+integrations --> [Supabase Storage] : uploads
+integrations --> [Supabase Realtime] : subscribes
+
+' Backend relationships
+api_routes --> api_models : validates
+api_routes --> database : queries
+database --> [Supabase Database] : connects
+api_routes --> [Supabase Auth] : validates
+
+' Frontend to Backend
+pages --> api_routes : HTTP requests
+integrations --> api_routes : API calls
+
+note right of pages
+  React Pages:
+  - Route-based components
+  - Handle navigation
+  - Compose layouts
+  - Manage page state
+end note
+
+note left of components
+  Reusable Components:
+  - UI building blocks
+  - Business logic
+  - Data presentation
+  - User interactions
+end note
+
+note bottom of contexts
+  Global State:
+  - Authentication state
+  - Theme preferences
+  - User data
+  - Shared functionality
+end note
+
+note top of api_routes
+  REST API Endpoints:
+  - CRUD operations
+  - Authentication
+  - File uploads
+  - Data validation
+end note
+
+note right of [Supabase Database]
+  PostgreSQL Features:
+  - Row Level Security
+  - Real-time subscriptions
+  - ACID transactions
+  - JSON support
+end note
+
+@enduml
