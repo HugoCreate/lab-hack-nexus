@@ -56,7 +56,7 @@ const CreatePostForm = () => {
 
         setCategories(data || []);
         setIsLoading(false);
-      } catch (error: any) {
+      } catch (error) {
         console.error('Error fetching categories:', error.message);
         toast({
           title: 'Erro ao carregar categorias',
