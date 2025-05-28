@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import PostCard from '@/components/PostCard';
@@ -11,10 +11,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search } from 'lucide-react';
+import { Search, Variable } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 // Mock Data - filtered to include only posts with substantial content
-const allPosts = [
+/* const allPosts = [
   {
     id: '1',
     title: 'Como identificar e explorar vulnerabilidades XSS em aplicações web',
@@ -70,24 +72,75 @@ const allPosts = [
     publishedAt: '18 Mar 2023',
     readTime: 15
   }
-];
+]; */
 
-// Extract unique categories
-const categories = [...new Set(allPosts.map(post => post.category.name))].map(name => {
-  const post = allPosts.find(p => p.category.name === name);
-  return { name, slug: post?.category.slug || '' };
-});
+
+
 
 const Posts = () => {
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const [selectedCategory, setSelectedCategory] = React.useState('all');
-  const [sortBy, setSortBy] = React.useState('recent');
-  const [filteredPosts, setFilteredPosts] = React.useState(allPosts);
+  const { toast } = useToast();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [sortBy, setSortBy] = useState('recent');
+  const [allPosts, setAllPosts] = useState([])
+  const [filteredPosts, setFilteredPosts] = useState([]);
 
-  React.useEffect(() => {
+  // Extract unique categories
+  // const categories = [...new Set(allPosts.map(post => post.category.name))].map(name => {
+  //   const post = allPosts.find(p => p.category.name === name);
+  //   return { name, slug: post?.category.slug || '' };
+  // });
+
+  const categories = useMemo(() => {
+    const uniqueCategories = allPosts.reduce((acc, post) => {
+      if(!post?.category?.slug || !post?.category?.name) return acc;
+      
+      if(!acc.some(category => category.slug === post.category.slug)) {
+        acc.push({
+          name: post.category.name,
+          slug: post.category.slug
+        })
+      }
+      return acc;
+    }, [] as {name: string, slug: string}[]);
+    return [{ name: "Todas Categorias", slug:"all"}, ...uniqueCategories]
+  }, [allPosts])
+
+  //Carrega todos os posts
+  useEffect(() => {
+    const fetchPosts = async () => {
+        try {
+          const {data: posts, error} = await supabase
+            .from('posts')
+            .select(`
+              *,
+              author:profiles(*)
+              category:categories(*)  
+            `)
+            .order('created_at', {ascending: false})
+            
+          if (error) throw error
+
+          setAllPosts(posts || []);
+          setFilteredPosts(posts || [])
+        } catch (error) {
+          console.error('Error selecting posts: ', error);
+          toast({
+            title: 'Erro ao listar posts',
+            description: error.message,
+            variant: 'destructive'
+          })
+        }
+    }
+    fetchPosts();
+  }, []) // array vazio significa que executa apenas uma vez
+
+
+  // Filtra a lista de posts baseado nos filtros
+  useEffect(() => {
     let result = [...allPosts];
     
-    // Filter by search query
+    // Filtro por busca textual
     if (searchQuery) {
       result = result.filter(post => 
         post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -95,12 +148,12 @@ const Posts = () => {
       );
     }
     
-    // Filter by category
+    // Filtro por categoria
     if (selectedCategory !== 'all') {
       result = result.filter(post => post.category.slug === selectedCategory);
     }
     
-    // Sort results
+    // Ordenação dos resultados
     if (sortBy === 'recent') {
       // Assume the posts are already sorted by recent in the mock data
     } else if (sortBy === 'oldest') {
@@ -110,7 +163,7 @@ const Posts = () => {
     }
     
     setFilteredPosts(result);
-  }, [searchQuery, selectedCategory, sortBy]);
+  }, [searchQuery, selectedCategory, sortBy, allPosts]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

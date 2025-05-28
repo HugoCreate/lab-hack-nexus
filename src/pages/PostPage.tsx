@@ -14,7 +14,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 // Combining all mock posts
-const allPosts = [
+/* const allPosts = [
   {
     id: '1',
     title: 'Como identificar e explorar vulnerabilidades XSS em aplicações web',
@@ -105,23 +105,53 @@ const allPosts = [
     relatedPosts: ['3', '4', '5']
   },
   // ... the rest of the mock posts
-];
+]; */
 
 const PostPage = () => {
   const { slug } = useParams<{ slug: string }>();
-  const [post, setPost] = useState<any>(null);
-  const [relatedPosts, setRelatedPosts] = useState<any[]>([]);
+  const [post, setPost] = useState(null);
+  const [relatedPosts, setRelatedPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [allPosts, setAllPosts] = useState([])
   const { user } = useAuth();
   const { toast } = useToast();
   
+    //Carrega todos os posts
+    useEffect(() => {
+      setIsLoading(true);
+
+      const fetchPosts = async () => {
+          try {
+            const {data: posts, error} = await supabase
+              .from('posts')
+              .select('*')
+              .order('created_at', {ascending: false})
+              
+            if (error) throw error
+  
+            setAllPosts(posts || []);
+          } catch (error) {
+            console.error('Error selecting posts: ', error);
+            toast({
+              title: 'Erro ao listar posts',
+              description: error.message,
+              variant: 'destructive'
+            })
+          }
+      }
+      fetchPosts();
+      setIsLoading(false);
+
+    }, []) // array vazio significa que executa apenas uma vez
+  
   // For now, we'll use the mock data, but in a real app you'd fetch from Supabase
   useEffect(() => {
+    console.log('hello')
     // Simulate loading
     setIsLoading(true);
     
     setTimeout(() => {
-      const foundPost = allPosts.find(p => p.slug === slug);
+      const foundPost = allPosts.find(post => post.slug === slug);
       setPost(foundPost || null);
       
       if (foundPost && foundPost.relatedPosts) {
