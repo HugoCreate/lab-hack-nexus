@@ -11,28 +11,10 @@ import SharePost from '@/components/SharePost';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
-interface Post {
-  id: string
-    title: string
-    content: string
-    thumbnail_url: string | null
-    slug: string
-    author: {
-      username: string,
-      avatar_url: string
-    },
-    category: {
-      name: string,
-      slug: string
-    },
-    created_at: string
-    published: boolean
-    updated_at: string
-}
 
 const PostPage = () => {
   const { slug } = useParams<{ slug: string }>();
-  const [post, setPost] = useState<Post>(null);
+  const [post, setPost] = useState(null);
   const [error, setError] = useState(null)
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import HeroSection from '@/components/HeroSection';
@@ -115,7 +115,30 @@ const recentPosts = [
   }
 ];
 
+interface Post {
+  id: string
+    title: string
+    content: string
+    thumbnail_url: string | null
+    slug: string
+    author: {
+      username: string,
+      avatar_url: string
+    },
+    category: {
+      name: string,
+      slug: string
+    },
+    created_at: string
+    published: boolean
+    updated_at: string
+}
+
 const Index = () => {
+  const [allPosts, setAllPosts] = useState<Post[]>([])
+
+  
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
@@ -170,7 +193,7 @@ const Index = () => {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredPosts.map((post) => (
+              {allPosts.map((post) => (
                 <PostCard key={post.id} post={post} />
               ))}
             </div>
