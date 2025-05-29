@@ -1,73 +1,127 @@
-# Welcome to your Lovable project
+# Nexus
 
-## Project info
+*"Sua academia digital de hacking ético. Treine, compartilhe, domine. A comunidade que fortalece sistemas desmontando eles primeiro.*
 
-**URL**: https://lovable.dev/projects/f61b4439-1c09-4b92-a84f-146f26a17942
+### Documentação TO-DO
 
-## How can I edit this code?
+- [ ] renomear os arquivos para convenção
+  - [ ] `CamelCase` para páginas, objetos e componentes
+- [ ] verificar frequencia de uso de componentes e alguams funções
+- [ ] agrupar páginas e componentes por prioridade de uso (ex: componente usado apenas nas paginas; componente está em pagina primeiro por ordem de aparição)
+- [ ] reorganizar documentação e adicionar descrição a cada item
+- [ ] 
 
-There are several ways of editing your application.
+# Paginas `pages/`
 
-**Use Lovable**
+Segue a lista de todas as páginas em ordem alfabética.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f61b4439-1c09-4b92-a84f-146f26a17942) and start prompting.
+## ``Account Settings.tsx``
+## ``Admin Dashboard.tsx``
+## ``Categories.tsx``
+## ``CategoryPage.tsx``
+## ``CreatePost.tsx``
+## ``Index.tsx``
+## ``Login.tsx``
+## ``NotFound.tsx``
+## ``PostPage.tsx``
+## ``Posts.tsx``
+## ``Privacidade.tsx``
+## ``Register.tsx``
+## ``SavedPosts.tsx``
+## ``Sobre.tsx``
+## ``Termos.tsx``
+## ``UserPosts.tsx``
 
-Changes made via Lovable will be committed automatically to this repo.
+# Componentes `components/`
 
-**Use your preferred IDE**
+Todos os componentes do projeto
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## ``CategoryCard.tsx``
+## ``CommentsSection.tsx``
+## ``CreatePostForm.tsx``
+## ``Footer.tsx``
+## ``HeroSection.tsx``
+## ``Navbar.tsx``
+## ``PostCard.tsx``
+## ``SharePost.tsx``
+## ``ThemeToggle.tsx``
+## ``WebsiteEditor.tsx``
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## UI `components/ui`
+Eu não abro mais essa pasta nem me pagando.
+### `toast.tsx`
 
-Follow these steps:
+# Contexts
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+<!-- ler sobre useContext, Context e AuthContext -->
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Hooks
+Hooks customizados feitos para facilitar algumas funções ou busca por variáveis que acontecem no programa todo. 
+## use-mobile.tsx
 
-# Step 3: Install the necessary dependencies.
-npm i
+Um hook que verifica se o aplicativo está rodando mobile ou não.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+### Descrição
+Salva um breakpoint genérico para tamanho de celular. Nisso ele cria um `MediaQueryList` com mais ou menos esse tamanho. E se o a largura da tela for menor od que isso, entao ele adicioana o event listener ao MediaQueryList, onChange. Atribui um estado para se é mobile ou não. **em resumo:** Retorna se é mobile ou não. 
+
+### `window.matchMedia(mediaQueryString)`
+
+#### ``return``
+**Retorna** `MediaQueryList` 
+
+#### propriedades
+* `matches` retorna um boleano que é true se o document atual bate com o media query list.
+* `media` um string representando uma media query 
+Ambas propriedades são `read-only` por motivos óbvios.
+#### métodos
+Herda os métodos do seu pai, `EventTarget`.
+
+---
+
+## use-toast.ts
+Um hook que permite voce criar um componente TSX de um Toast com poucas variáveis.
+
+### ToasterToast
+ToasterToast será o tipo que deve ser passado como parametro para a construção de um toast. Basta um id, titulo do toast, descrição que será o texto do componente e uma ação.
+
+- [ ] ler sobre ToastProps em `src/components/ui/toast.tsx`
+- [ ] documentar ou apagar `toast.tsx`
+
+```TypeScript
+type ToasterToast = ToastProps & (
+    id: string
+    title?: React.ReactNode
+    description?: React.ReactNode
+    action?: ToastActionElement
+)
 ```
 
-**Edit a file directly in GitHub**
+### ActionTypes
+Uma ação para um ToasterToast é nada mais nada menos do que a maneira com que ele deve aparecer no documento. 
+```TypeScript
+type actionTypes = {
+    ADD_TOAST: "ADD_TOAST",
+    UPDATE_TOAST: "UPDATE_TOAST",
+    DISMISS_TOAST: "DISMISS_TOAST",
+    REMOVE_TOAST: "REMOVE_TOAST",
+}
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
+## useSavedPost.tsx
+Adiciona ou remove um post da tabela de posts salvos. 
 
-**Use GitHub Codespaces**
+### Descrição
+Verifica se o post já foi salvo, tendo o usuário logado e o posto adicion, caso tenha sido ele é "de-salvo" e é deletado da tabela no supabase. Mostra um toast quando remove o post. Caso contrário adicionada o posta na tabela de posts salvos e mostra um toast no sucesso. 
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+# `intregations/`
+- [ ] documentar integrações
 
-## What technologies are used for this project?
+# `lib/`
+- [ ] documentar bibliotecas
 
-This project is built with:
+# `supabase/`
+- [ ] documentar conexao com supabase
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/f61b4439-1c09-4b92-a84f-146f26a17942) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes it is!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Migrações do supabase
+<!-- Ler sobre migration no supabase, npm supabase.js -->
