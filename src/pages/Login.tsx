@@ -33,7 +33,7 @@ const Login = () => {
       });
 
       navigate('/');
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Erro no login",
         description: error.message,
@@ -87,12 +87,12 @@ const Login = () => {
                   <Label htmlFor="password" className="text-sm">
                     Senha
                   </Label>
-                  <Link 
+{/*                   <Link 
                     to="/forgot-password" 
                     className="text-xs text-cyber-blue hover:text-cyber-purple transition-colors"
                   >
                     Esqueceu sua senha?
-                  </Link>
+                  </Link> */}
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
