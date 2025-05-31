@@ -117,6 +117,7 @@ const CreatePostForm = () => {
         author_id: user.id,
         category_id: categoryId || null,
         thumbnail_url: finalThumbnailUrl || null,
+        createdby_id: 
         published: false, // Draft by default
       });
 

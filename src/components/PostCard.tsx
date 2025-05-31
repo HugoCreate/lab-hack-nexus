@@ -6,31 +6,9 @@ import { Calendar } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 import { format } from 'date-fns';
+import { Post } from '@/pages/Posts/types';
 
-interface PostCardProps {
-  post: {
-    id: string
-    title: string
-    content: string
-    thumbnail_url: string | null
-    slug: string
-    author: {
-      username: string,
-      avatar_url: string
-    },
-    category: {
-      name: string,
-      slug: string
-    },
-    created_at: string
-    published: boolean
-    updated_at: string
-
-  };
-  
-}
-
-const PostCard = ({ post }: PostCardProps) => {
+const PostCard = ({ post }: {post: Post}) => {
   const { theme } = useTheme();
   const isLight = theme === 'light';
   

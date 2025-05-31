@@ -78,7 +78,6 @@ const Posts = () => {
   useEffect(() => {
     let result = [...allPosts];
     
-    // Filtrar por pesquisa
     // Filtro por busca textual
     if (searchQuery) {
       result = result.filter(post => 

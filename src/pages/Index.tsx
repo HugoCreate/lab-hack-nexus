@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { Post } from './Posts/types';
 
 // Função para buscar categorias do Supabase
 const fetchCategories = async (limit = 3) => {
@@ -46,87 +47,6 @@ const getCategoryIcon = (slug: string): 'code' | 'terminal' | 'wifi' | 'cpu' | '
   return iconMapping[slug] || 'code';
 };
 
-// Featured posts - only keeping posts with substantial content
-const featuredPosts = [
-  {
-    id: '1',
-    title: 'Como identificar e explorar vulnerabilidades XSS em aplicações web',
-    excerpt: 'Aprenda como identificar, testar e mitigar vulnerabilidades de Cross-Site Scripting (XSS) em aplicações web modernas.',
-    slug: 'como-identificar-xss',
-    coverImage: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
-    category: { name: 'Web App Hacking', slug: 'web-app-hacking' },
-    author: { name: 'Marcos Silva', avatar: '/placeholder.svg' },
-    publishedAt: '12 Fev 2023',
-    readTime: 8
-  },
-  {
-    id: '2',
-    title: 'Guia completo para iniciantes em sistemas Linux',
-    excerpt: 'Um guia passo a passo para quem está começando a usar Linux, com foco em ferramentas para segurança da informação.',
-    slug: 'guia-iniciantes-linux',
-    coverImage: 'https://images.unsplash.com/photo-1567301861629-03a59ece5b67?auto=format&fit=crop&w=800&q=80',
-    category: { name: 'Linux', slug: 'linux' },
-    author: { name: 'Paulo Machado', avatar: '/placeholder.svg' },
-    publishedAt: '05 Mar 2023',
-    readTime: 12
-  },
-  {
-    id: '3',
-    title: 'Introdução ao Capture The Flag (CTF): Como participar e aprender',
-    excerpt: 'Descubra como as competições CTF podem acelerar seu aprendizado em segurança cibernética de forma prática.',
-    slug: 'introducao-ctf',
-    coverImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80',
-    category: { name: 'Introdução a Hacking', slug: 'introducao-hacking' },
-    author: { name: 'Carla Mendes', avatar: '/placeholder.svg' },
-    publishedAt: '20 Jan 2023',
-    readTime: 6
-  }
-];
-
-// Recent posts - only keeping posts with substantial content
-const recentPosts = [
-  {
-    id: '4',
-    title: 'Análise avançada de pacotes com Wireshark',
-    excerpt: 'Técnicas avançadas para analisar tráfego de rede e identificar atividades suspeitas usando Wireshark.',
-    slug: 'analise-pacotes-wireshark',
-    coverImage: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80',
-    category: { name: 'Redes', slug: 'redes' },
-    author: { name: 'Roberto Alves', avatar: '/placeholder.svg' },
-    publishedAt: '03 Abr 2023',
-    readTime: 10
-  },
-  {
-    id: '5',
-    title: 'Raspberry Pi como ferramenta de pentesting',
-    excerpt: 'Aprenda como transformar um Raspberry Pi em uma poderosa ferramenta de teste de penetração portátil.',
-    slug: 'raspberry-pi-pentesting',
-    coverImage: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=800&q=80',
-    category: { name: 'Hardware Hacking', slug: 'hardware-hacking' },
-    author: { name: 'Ana Souza', avatar: '/placeholder.svg' },
-    publishedAt: '18 Mar 2023',
-    readTime: 15
-  }
-];
-
-interface Post {
-  id: string
-    title: string
-    content: string
-    thumbnail_url: string | null
-    slug: string
-    author: {
-      username: string,
-      avatar_url: string
-    },
-    category: {
-      name: string,
-      slug: string
-    },
-    created_at: string
-    published: boolean
-    updated_at: string
-}
 // Função para buscar posts do Supabase
 const fetchPosts = async () => {
   try {
