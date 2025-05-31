@@ -8,7 +8,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 import { format } from 'date-fns';
 import { Post } from '@/pages/Posts/types';
 
-const PostCard = ({ post }: {post: Post}) => {
+interface PostCardProps {
+  post: Post
+}
+
+const PostCard = ({ post }) => {
   const { theme } = useTheme();
   const isLight = theme === 'light';
   
