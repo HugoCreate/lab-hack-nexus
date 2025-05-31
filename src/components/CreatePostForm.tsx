@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Loader2, Image } from 'lucide-react';
+import { Category } from '@/pages/Posts/types';
 
 // Utility function to create a URL-friendly slug
 const createSlug = (text: string) => {
@@ -38,7 +39,7 @@ const CreatePostForm = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [categoryId, setCategoryId] = useState('');
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [thumbnailUrl, setThumbnailUrl] = useState('');
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -114,10 +115,11 @@ const CreatePostForm = () => {
         title,
         content,
         slug,
-        author_id: user.id,
+        author_id: null,
         category_id: categoryId || null,
         thumbnail_url: finalThumbnailUrl || null,
-        published: false, // Draft by default
+        createdby_id: user.id,
+        published: false // Draft by default
       });
 
       if (error) throw error;
@@ -128,7 +130,7 @@ const CreatePostForm = () => {
       });
       
       navigate('/account/posts');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error creating post:', error);
       toast({
         title: 'Erro ao criar post',
