@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import HeroSection from '@/components/HeroSection';
@@ -10,6 +9,7 @@ import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { Post } from './Posts/types';
 
 // Função para buscar categorias do Supabase
 const fetchCategories = async (limit = 3) => {
@@ -107,6 +107,10 @@ const fetchPosts = async () => {
 };
 
 const Index = () => {
+  const [allPosts, setAllPosts] = useState<Post[]>([])
+
+  
+
   // Buscar categorias do Supabase
   const { data: categories = [], isLoading: loadingCategories } = useQuery({
     queryKey: ['home-categories'],
@@ -190,7 +194,7 @@ const Index = () => {
               </div>
             ) : featuredPosts.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {featuredPosts.map((post) => (
+                {allPosts.map((post) => (
                   <PostCard key={post.id} post={post} />
                 ))}
               </div>

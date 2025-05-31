@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import PostCard from '@/components/PostCard';
@@ -12,105 +11,74 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { Search, Variable } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-
-// Função para buscar posts do Supabase
-const fetchPosts = async () => {
-  try {
-    // Primeiro, buscamos os posts básicos
-    const { data: postsData, error: postsError } = await supabase
-      .from('posts')
-      .select(`
-        *,
-        categories:category_id (name, slug)
-      `)
-      .eq('published', true)
-      .order('created_at', { ascending: false });
-    
-    if (postsError) {
-      console.error('Error fetching posts:', postsError);
-      throw postsError;
-    }
-    
-    // Para cada post, buscamos informações do autor separadamente
-    const postsWithAuthors = await Promise.all(postsData.map(async (post) => {
-      // Buscar informações do autor
-      const { data: authorData } = await supabase
-        .from('profiles')
-        .select('username, avatar_url')
-        .eq('id', post.author_id)
-        .single();
-      
-      // Usar valores padrão se não encontrar o autor
-      const author = authorData || {
-        username: 'Autor desconhecido',
-        avatar_url: '/placeholder.svg'
-      };
-      
-      return {
-        id: post.id,
-        title: post.title,
-        excerpt: post.content ? post.content.substring(0, 150) + '...' : '',
-        slug: post.slug,
-        coverImage: post.thumbnail_url || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
-        category: {
-          name: post.categories?.name || 'Sem categoria',
-          slug: post.categories?.slug || ''
-        },
-        author: {
-          name: author.username,
-          avatar: author.avatar_url
-        },
-        publishedAt: new Date(post.created_at).toLocaleDateString('pt-BR'),
-        readTime: Math.ceil(post.content?.length / 1000) || 5
-      };
-    }));
-    
-    return postsWithAuthors;
-  } catch (error) {
-    console.error('Error processing posts:', error);
-    return [];
-  }
-};
-
-// Função para buscar categorias do Supabase
-const fetchCategories = async () => {
-  const { data, error } = await supabase
-    .from('categories')
-    .select('name, slug')
-    .order('name');
-  
-  if (error) {
-    console.error('Error fetching categories:', error);
-    throw error;
-  }
-  
-  return data;
-};
+import { useToast } from '@/hooks/use-toast';
 
 const Posts = () => {
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const [selectedCategory, setSelectedCategory] = React.useState('all');
-  const [sortBy, setSortBy] = React.useState('recent');
+  const { toast } = useToast();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [sortBy, setSortBy] = useState('recent');
+  const [allPosts, setAllPosts] = useState([])
+  const [filteredPosts, setFilteredPosts] = useState([]);
 
-  // Buscar posts e categorias do Supabase
-  const { data: posts = [], isLoading: loadingPosts } = useQuery({
-    queryKey: ['posts'],
-    queryFn: fetchPosts,
-  });
-  
-  const { data: categories = [], isLoading: loadingCategories } = useQuery({
-    queryKey: ['post-categories'],
-    queryFn: fetchCategories,
-  });
-  
-  // Filtrar e ordenar posts
-  const filteredPosts = React.useMemo(() => {
-    let result = [...posts];
+  // Extract unique categories
+  // const categories = [...new Set(allPosts.map(post => post.category.name))].map(name => {
+  //   const post = allPosts.find(p => p.category.name === name);
+  //   return { name, slug: post?.category.slug || '' };
+  // });
+
+  const categories = useMemo(() => {
+    const uniqueCategories = allPosts.reduce((acc, post) => {
+      if(!post?.category?.slug || !post?.category?.name) return acc;
+      
+      if(!acc.some(category => category.slug === post.category.slug)) {
+        acc.push({
+          name: post.category.name,
+          slug: post.category.slug
+        })
+      }
+      return acc;
+    }, [] as {name: string, slug: string}[]);
+    return [{ name: "Todas Categorias", slug:"all"}, ...uniqueCategories]
+  }, [allPosts])
+
+  //Carrega todos os posts
+  useEffect(() => {
+    const fetchPosts = async () => {
+        try {
+          const {data: posts, error} = await supabase
+            .from('posts')
+            .select(`
+              *,
+              author:profiles(*)
+              category:categories(*)  
+            `)
+            .order('created_at', {ascending: false})
+            
+          if (error) throw error
+
+          setAllPosts(posts || []);
+          setFilteredPosts(posts || [])
+        } catch (error) {
+          console.error('Error selecting posts: ', error);
+          toast({
+            title: 'Erro ao listar posts',
+            description: error.message,
+            variant: 'destructive'
+          })
+        }
+    }
+    fetchPosts();
+  }, []) // array vazio significa que executa apenas uma vez
+
+
+  // Filtra a lista de posts baseado nos filtros
+  useEffect(() => {
+    let result = [...allPosts];
     
-    // Filtrar por pesquisa
+    // Filtro por busca textual
     if (searchQuery) {
       result = result.filter(post => 
         post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -118,12 +86,12 @@ const Posts = () => {
       );
     }
     
-    // Filtrar por categoria
+    // Filtro por categoria
     if (selectedCategory !== 'all') {
       result = result.filter(post => post.category.slug === selectedCategory);
     }
     
-    // Ordenar resultados
+    // Ordenação dos resultados
     if (sortBy === 'recent') {
       // Já ordenado por created_at descendente
     } else if (sortBy === 'oldest') {
@@ -132,8 +100,8 @@ const Posts = () => {
       result = [...result].sort((a, b) => a.readTime - b.readTime);
     }
     
-    return result;
-  }, [posts, searchQuery, selectedCategory, sortBy]);
+    setFilteredPosts(result);
+  }, [searchQuery, selectedCategory, sortBy, allPosts]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
