@@ -9,8 +9,9 @@ export function useTitle() {
     useEffect(() => {
         const titles = {
         '/': 'Home',
+        '/post': 'Post',
         '/posts': 'Posts',
-        '/category/*': 'Categoria - ',
+        '/category/*': 'Categoria',
         '/categories': 'Categorias',
         '/sobre': 'Sobre Nós',
         '/termos': 'Termos',
@@ -29,7 +30,7 @@ export function useTitle() {
             dynamic = words.map(word => 
                 word.replace(word.charAt(0), word.charAt(0).toUpperCase())).join(' ')
             if (location.pathname.startsWith(basePath)) {
-                document.title = name + dynamic 
+                document.title = name  
             }
             // else document.title = brand
         }

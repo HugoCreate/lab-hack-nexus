@@ -54,7 +54,8 @@ const UserPosts = () => {
             slug, 
             published, 
             created_at,
-            categories:category_id (name)
+            categories:category_id (name),
+            profiles: author (*)
           `)
           .eq('author_id', user.id)
           .order('created_at', { ascending: false });
@@ -190,14 +191,14 @@ const UserPosts = () => {
                         </TableCell>
                         <TableCell>
                           {post.published ? (
-                            <Badge className="bg-green-500">Publicado</Badge>
+                            <Badge variant="disabled" className="bg-green-800">Publicado</Badge>
                           ) : (
-                            <Badge variant="outline" className="text-amber-500 border-amber-500">
+                            <Badge variant="disabled" className="text-amber-500 border-amber-500">
                               Rascunho
                             </Badge>
                           )}
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-center">
                           <div className="flex justify-end gap-2">
                             <Button variant="ghost" size="icon">
                               <Edit className="h-4 w-4" />
@@ -234,40 +235,38 @@ const UserPosts = () => {
                                 </AlertDialogFooter>
                               </AlertDialogContent>
                             </AlertDialog>
-                          </div>
-                          <div className="flex justify-end gap-2">
                             <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button variant='ghost' size='icon'>
-                                  <ArrowUpFromLine className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertTriangle className="h-6 w-6 text-yellow-500 mb-2" />
-                                  <AlertDialogTitle>Publicar post</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Está pronto para publicar "{post.title}"? Não será possível edita-lo depois de publicado.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => {
-                                      setPostToPublish(post.id);
-                                      handlePublishPost();
-                                    }}
-                                    disabled={isPublishPost}
-                                    className="bg-yellow-500 text-white hover:bg-yellow-600"
-                                  >
-                                    {isPublishPost && postToPublish === post.id ? (
-                                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                                    ) : null}
-                                    Publicar
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant='ghost' size='icon'>
+                                    <ArrowUpFromLine className="h-4 w-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertTriangle className="h-6 w-6 text-yellow-500 mb-2" />
+                                    <AlertDialogTitle>Publicar post</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Está pronto para publicar "{post.title}"? Não será possível edita-lo depois de publicado.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => {
+                                        setPostToPublish(post.id);
+                                        handlePublishPost();
+                                      }}
+                                      disabled={isPublishPost}
+                                      className="bg-yellow-500 text-white hover:bg-yellow-600"
+                                    >
+                                      {isPublishPost && postToPublish === post.id ? (
+                                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                      ) : null}
+                                      Publicar
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
                           </div>
                         </TableCell>
                       </TableRow>

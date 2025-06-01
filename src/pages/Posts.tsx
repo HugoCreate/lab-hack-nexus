@@ -14,94 +14,133 @@ import {
 import { Search, Variable } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useQuery } from '@tanstack/react-query';
+import { useTitle } from '@/hooks/use-title';
 
 const Posts = () => {
+  useTitle()
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [allCategories, setAllCategories] = useState([]);
+  const [selectedSlug, setSelectedSlug] = useState('all');
   const [sortBy, setSortBy] = useState('recent');
   const [allPosts, setAllPosts] = useState([])
   const [filteredPosts, setFilteredPosts] = useState([]);
-
-  // Extract unique categories
-  // const categories = [...new Set(allPosts.map(post => post.category.name))].map(name => {
-  //   const post = allPosts.find(p => p.category.name === name);
-  //   return { name, slug: post?.category.slug || '' };
-  // });
-
-  const categories = useMemo(() => {
-    const uniqueCategories = allPosts.reduce((acc, post) => {
-      if(!post?.category?.slug || !post?.category?.name) return acc;
-      
-      if(!acc.some(category => category.slug === post.category.slug)) {
-        acc.push({
-          name: post.category.name,
-          slug: post.category.slug
-        })
-      }
-      return acc;
-    }, [] as {name: string, slug: string}[]);
-    return [{ name: "Todas Categorias", slug:"all"}, ...uniqueCategories]
-  }, [allPosts])
-
+  
   //Carrega todos os posts
-  useEffect(() => {
-    const fetchPosts = async () => {
-        try {
-          const {data: posts, error} = await supabase
-            .from('posts')
-            .select(`
-              *,
-              author:profiles(*)
-              category:categories(*)  
-            `)
-            .order('created_at', {ascending: false})
-            
-          if (error) throw error
+  const fetchPosts = async () => {
+      try {
+        const {data, error} = await supabase
+          .from('posts')
+          .select(`
+            *,
+            author:profiles(*),
+            categories(name, slug)  
+          `)
+          .eq('published', true)
+          .order('created_at', {ascending: false})
+          
+        if (error) throw error
 
-          setAllPosts(posts || []);
-          setFilteredPosts(posts || [])
-        } catch (error) {
-          console.error('Error selecting posts: ', error);
-          toast({
-            title: 'Erro ao listar posts',
-            description: error.message,
-            variant: 'destructive'
-          })
-        }
+        setAllPosts(data || []);
+        setFilteredPosts(data || [])
+        return data;
+      } catch (error) {
+        console.error('Error selecting posts: ', error);
+        toast({
+          title: 'Erro ao listar posts',
+          description: error.message,
+          variant: 'destructive'
+        })
+        return [];
+      }
+  }
+  const fetchCategories = async () => {
+    try {
+      const {data, error} = await supabase
+        .from('categories')
+        .select('*')
+
+      if (error) throw error 
+
+      setAllCategories(data || [])
+      return data;
+    } catch (error) {
+      console.error('Error fetching categories: ', error);
+      toast({
+        title: 'Erro ao listar categorias',
+        description: error.message,
+        variant: 'destructive'
+      })
     }
-    fetchPosts();
-  }, []) // array vazio significa que executa apenas uma vez
+  }
 
+  const {data: posts = [], isLoading: isLoadingPosts} = useQuery({
+    queryKey: ['postsList-posts'],
+    queryFn: fetchPosts,
+  })
+
+  const {data: categories = [], isLoading: isLoadingCategories} = useQuery({
+    queryKey: ['postList-categories'],
+    queryFn: fetchCategories,
+  })
 
   // Filtra a lista de posts baseado nos filtros
   useEffect(() => {
     let result = [...allPosts];
-    
+
     // Filtro por busca textual
-    if (searchQuery) {
+    try {
+      //TODO: Corrigir busca por texto
       result = result.filter(post => 
-        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
+        (post.title?.trim().toLowerCase() || '').includes(searchQuery.toLowerCase().trim()) ||
+        (post.content?.trim().toLowerCase() || '').includes(searchQuery.toLowerCase().trim())
       );
+    } catch (error) {
+      console.error('Error at querying search text: ', error);
+      toast({
+        title: 'Erro ao buscar post por texto',
+        description: error.message,
+        variant: 'destructive'  
+      })
+    }
+
+    
+    try {
+      // Filtro por categoria
+      if (selectedSlug !== 'all') {
+        result = result.filter(post => post.categories?.slug === selectedSlug);
+      } else {
+        result = [...allPosts]
+      }
+    } catch (error) {
+      console.error('Error at querying post category: ', error);
+      toast({
+        title: 'Erro ao buscar post por categoria',
+        description: error.message,
+        variant: 'destructive'  
+      })
     }
     
-    // Filtro por categoria
-    if (selectedCategory !== 'all') {
-      result = result.filter(post => post.category.slug === selectedCategory);
+    try {
+      // Ordenação dos resultados
+      if (sortBy === 'recent') // Já ordenado por created_at descendente
+        result = [...result]
+      else if (sortBy === 'oldest')// Portanto é só inverter
+        result = [...result].reverse();
+      
+    } catch (error) {
+      console.error('Error at sorting posts: ', error);
+      toast({
+        title: 'Erro ao ordenar posts',
+        description: error.message,
+        variant: 'destructive'  
+      })
     }
     
-    // Ordenação dos resultados
-    if (sortBy === 'recent') {
-      // Já ordenado por created_at descendente
-    } else if (sortBy === 'oldest') {
-      result = [...result].reverse();
-    } else if (sortBy === 'readTime') {
-      result = [...result].sort((a, b) => a.readTime - b.readTime);
-    }
     
     setFilteredPosts(result);
-  }, [searchQuery, selectedCategory, sortBy, allPosts]);
+  }, [searchQuery, selectedSlug, sortBy, allPosts]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -124,6 +163,7 @@ const Posts = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                 <Input
+                  disabled
                   placeholder="Pesquisar posts..."
                   className="pl-10 border-cyber-purple/20 focus:border-cyber-purple"
                   value={searchQuery}
@@ -132,16 +172,16 @@ const Posts = () => {
               </div>
               
               <Select 
-                value={selectedCategory} 
-                onValueChange={setSelectedCategory}
-                disabled={loadingCategories}
+                value={selectedSlug} 
+                onValueChange={(e) => setSelectedSlug(e)}
+                disabled={isLoadingCategories}
               >
                 <SelectTrigger className="border-cyber-purple/20">
                   <SelectValue placeholder="Filtrar por categoria" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todas categorias</SelectItem>
-                  {categories.map((category) => (
+                  {allCategories.map((category) => (
                     <SelectItem key={category.slug} value={category.slug}>
                       {category.name}
                     </SelectItem>
@@ -161,17 +201,17 @@ const Posts = () => {
               </Select>
             </div>
             
-            {selectedCategory !== 'all' && (
+            {selectedSlug !== 'all' && (
               <div className="mt-4 flex items-center">
                 <span className="text-sm text-muted-foreground mr-2">Filtros ativos:</span>
                 <Badge 
-                  variant="outline" 
+                  variant="disabled" 
                   className="border-cyber-purple/30 text-cyber-purple flex items-center"
                 >
-                  {categories.find(c => c.slug === selectedCategory)?.name}
+                  {allCategories.find(c => c.slug == selectedSlug)?.name}
                   <button 
                     className="ml-1 hover:text-white" 
-                    onClick={() => setSelectedCategory('all')}
+                    onClick={() => setSelectedSlug('all')}
                   >
                     ×
                   </button>
@@ -181,7 +221,7 @@ const Posts = () => {
           </div>
           
           {/* Posts Grid */}
-          {loadingPosts ? (
+          {isLoadingPosts ? (
             <div className="text-center py-16">
               <p className="text-muted-foreground">Carregando posts...</p>
             </div>

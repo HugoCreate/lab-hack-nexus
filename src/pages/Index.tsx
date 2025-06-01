@@ -48,65 +48,6 @@ const fetchCategories = async (limit = 3) => {
   }));
 };
 
-// Função para buscar posts do Supabase
-const fetchPosts = async () => {
-  try {
-    // Primeiro, buscamos os posts básicos
-    const { data: postsData, error: postsError } = await supabase
-      .from('posts')
-      .select(`
-        *,
-        categories:category_id (name, slug)
-      `)
-      .eq('published', true)
-      .order('created_at', { ascending: false });
-    
-    if (postsError) {
-      console.error('Error fetching posts:', postsError);
-      throw postsError;
-    }
-    
-    // Para cada post, buscamos informações do autor separadamente
-    const postsWithAuthors = await Promise.all(postsData.map(async (post) => {
-      // Buscar informações do autor
-      const { data: authorData } = await supabase
-        .from('profiles')
-        .select('username, avatar_url')
-        .eq('id', post.author_id)
-        .single();
-      
-      // Usar valores padrão se não encontrar o autor
-      const author = authorData || {
-        username: 'Autor desconhecido',
-        avatar_url: '/placeholder.svg'
-      };
-      
-      return {
-        id: post.id,
-        title: post.title,
-        excerpt: post.content ? post.content.substring(0, 150) + '...' : '',
-        slug: post.slug,
-        coverImage: post.thumbnail_url || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
-        category: {
-          name: post.categories?.name || 'Sem categoria',
-          slug: post.categories?.slug || ''
-        },
-        author: {
-          name: author.username,
-          avatar: author.avatar_url
-        },
-        publishedAt: new Date(post.created_at).toLocaleDateString('pt-BR'),
-        readTime: Math.ceil(post.content?.length / 1000) || 5
-      };
-    }));
-    
-    return postsWithAuthors;
-  } catch (error) {
-    console.error('Error processing posts:', error);
-    return [];
-  }
-};
-
 const Index = () => {
   useTitle();
   const [allPosts, setAllPosts] = useState([])  
@@ -236,11 +177,11 @@ const Index = () => {
                   Posts <span className="text-cyber-blue">Em Destaque</span>
                 </h2>
                 <p className="text-muted-foreground">
-                  Conteúdo selecionado pelos nossos especialistas
+                  Confira os conteúdo adicionados mais recentemente em nossa Wiki.
                 </p>
               </div>
               <Link to="/posts" className="mt-4 md:mt-0">
-                <Button variant="outline" className="border-cyber-blue/30">
+                <Button variant="outline" className="border-cyber-purple/30">
                   Ver todos posts <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
               </Link>
