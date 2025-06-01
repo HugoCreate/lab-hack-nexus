@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from './ui/badge';
-import { Code, Terminal, Wifi, Cpu, FileCode, ChevronRight } from 'lucide-react';
+import { Code, Terminal, Wifi, Cpu, FileCode, ChevronRight, Library } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 
@@ -11,13 +11,14 @@ type Category = {
   name: string;
   slug: string;
   description: string;
-  icon: 'code' | 'terminal' | 'wifi' | 'cpu' | 'fileCode';
+  icon: 'code' | 'terminal' | 'library' | 'wifi' | 'cpu' | 'fileCode';
 };
 
 const iconMap = {
   code: Code,
   terminal: Terminal,
   wifi: Wifi,
+  library: Library,
   cpu: Cpu,
   fileCode: FileCode
 };

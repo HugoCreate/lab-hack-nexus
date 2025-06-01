@@ -13,7 +13,7 @@ const fetchCategories = async () => {
   const { data, error } = await supabase
     .from('categories')
     .select('*')
-    .order('name');
+    .order('name', {ascending: false});
   
   if (error) {
     console.error('Error fetching categories:', error);
@@ -28,10 +28,10 @@ const fetchCategories = async () => {
 };
 
 // Função auxiliar para determinar o ícone com base no slug
-const getCategoryIcon = (slug: string): 'code' | 'terminal' | 'wifi' | 'cpu' | 'fileCode' => {
-  const iconMapping: Record<string, 'code' | 'terminal' | 'wifi' | 'cpu' | 'fileCode'> = {
+const getCategoryIcon = (slug: string): 'code' | 'terminal' | 'library' | 'wifi' | 'cpu' | 'fileCode' => {
+  const iconMapping: Record<string, 'code' | 'terminal' | 'library' | 'wifi' | 'cpu' | 'fileCode'> = {
     'web-app-hacking': 'code',
-    'introducao-hacking': 'terminal',
+    'introducao-hacking': 'library',
     'linux': 'terminal',
     'redes': 'wifi',
     'hardware-hacking': 'cpu',
