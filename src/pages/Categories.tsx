@@ -8,6 +8,19 @@ import { Input } from '@/components/ui/input';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+// Dicionário de Icones para cada Slug
+// TODO: Colocar os icone-slug no banco de dados
+const iconMapping: Record<string, 'code' | 'terminal' | 'library' | 'wifi' | 'cpu' | 'fileCode'> = {
+  'web-app-hacking': 'code',
+  'introducao-hacking': 'library',
+  'linux': 'terminal',
+  'redes': 'wifi',
+  'hardware-hacking': 'cpu',
+  'mobile-hacking': 'code',
+  'forense-digital': 'fileCode',
+  'engenharia-social': 'code'
+};
+
 // Função para buscar categorias do Supabase
 const fetchCategories = async () => {
   const { data, error } = await supabase
@@ -23,25 +36,10 @@ const fetchCategories = async () => {
   // Mapear os dados para incluir a propriedade icon
   return data.map(category => ({
     ...category,
-    icon: getCategoryIcon(category.slug)
+    icon: iconMapping[category.slug] || 'code'
   }));
 };
 
-// Função auxiliar para determinar o ícone com base no slug
-const getCategoryIcon = (slug: string): 'code' | 'terminal' | 'library' | 'wifi' | 'cpu' | 'fileCode' => {
-  const iconMapping: Record<string, 'code' | 'terminal' | 'library' | 'wifi' | 'cpu' | 'fileCode'> = {
-    'web-app-hacking': 'code',
-    'introducao-hacking': 'library',
-    'linux': 'terminal',
-    'redes': 'wifi',
-    'hardware-hacking': 'cpu',
-    'mobile-hacking': 'code',
-    'forense-digital': 'fileCode',
-    'engenharia-social': 'code'
-  };
-  
-  return iconMapping[slug] || 'code';
-};
 
 const Categories = () => {
   const [searchQuery, setSearchQuery] = React.useState('');

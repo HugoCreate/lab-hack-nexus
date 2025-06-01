@@ -2,6 +2,19 @@
 
 *"Sua academia digital de hacking ético. Treine, compartilhe, domine. A comunidade que fortalece sistemas desmontando eles primeiro.*
 
+## Tecnologias
+
+1. Node
+2. React
+3. Vite
+4. Eslint
+5. Tailwind
+6. TypeScript
+7. Supabase
+8. Docker
+9. Nginx
+10. TanStack
+
 ### Documentação TO-DO
 
 - [ ] renomear os arquivos para convenção
