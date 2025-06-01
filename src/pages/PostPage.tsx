@@ -17,8 +17,8 @@ import { Post } from './Posts/types';
 const PostPage = () => {
   useTitle()
   const { slug } = useParams<{ slug: string }>();
-  const [post, setPost] = useState<Post>(null);
-  const [error, setError] = useState(null)
+  const [post, setPost] = useState<Post | null>(null);
+  const [error, setError] = useState<Error>(null)
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   
@@ -27,13 +27,13 @@ const PostPage = () => {
       const fetchPost = async () => {
         try {
           setIsLoading(true);
-          console.log('carregando')
+          
           const { data, error } = await supabase
             .from('posts')
             .select(`
               *,
               author:profiles(*),
-              category:categories(*)  
+              category: categories(*)  
             `)
             .eq('slug', slug)
             .eq('published', true)
@@ -133,7 +133,7 @@ const PostPage = () => {
               <div className="flex flex-wrap items-center gap-4 md:gap-6 text-sm text-muted-foreground">
                 <div className="flex items-center">
                   <Avatar className="h-8 w-8 mr-2">
-                    <AvatarImage src={post.author.avatar_url} alt={post.author.username} />
+                    <AvatarImage src={post.author.avatarUrl} alt={post.author.username} />
                     <AvatarFallback>{post.author.username[0]}</AvatarFallback>
                   </Avatar>
                   <span>{post.author.username}</span>
