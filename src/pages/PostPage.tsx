@@ -10,11 +10,14 @@ import CommentSection from '@/components/CommentSection';
 import SharePost from '@/components/SharePost';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useTitle } from '@/hooks/use-title';
+import { Post } from './Posts/types';
 
 
 const PostPage = () => {
+  useTitle()
   const { slug } = useParams<{ slug: string }>();
-  const [post, setPost] = useState(null);
+  const [post, setPost] = useState<Post>(null);
   const [error, setError] = useState(null)
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
@@ -101,11 +104,15 @@ const PostPage = () => {
         <Navbar />
         
         <div className="relative h-[400px] md:h-[500px] overflow-hidden">
-          <img 
-            src={post.thumbnail_url} 
-            alt={post.title}
-            className="w-full h-full object-cover"
-          />
+          {/* Thumbnail Image */}
+          { post.thumbnail_url && (
+            <img 
+              src={post.thumbnail_url} 
+              alt={post.title}
+              className="w-full h-full object-cover"
+            />
+          )}
+          
           <div className="absolute inset-0 bg-gradient-to-b from-cyber-black/70 to-cyber-black/30"></div>
           
           <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12">
@@ -154,15 +161,17 @@ const PostPage = () => {
               <div className="mt-8 cyber-card p-6">
                 <div className="flex items-center">
                   <Avatar className="h-16 w-16">
-                    <AvatarImage src={post.author.avatar_url} alt={post.author.username} />
+                    <AvatarImage src={post.author.avatarUrl} alt={post.author.username} />
                     <AvatarFallback className="bg-cyber-purple/20 text-cyber-purple text-xl">
-                      {post.author.username.charAt(0)}
+                      {post.author.username.charAt(0).toUpperCase()}{post.author.username.charAt(1).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="ml-4">
-                    <h3 className="text-lg font-medium">{post.author.username}</h3>
+                    <h3 className="text-lg font-medium">
+                      {post.author.username}
+                      </h3>
                     <p className="text-muted-foreground text-sm">
-                      Especialista em segurança cibernética com mais de 5 anos de experiência em testes de penetração e análise de vulnerabilidades.
+                      {/* TODO: Adicionar bio do autor do post */}
                     </p>
                   </div>
                 </div>

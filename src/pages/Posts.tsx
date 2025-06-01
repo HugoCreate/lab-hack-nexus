@@ -33,13 +33,11 @@ const Posts = () => {
         const {data, error} = await supabase
           .from('posts')
           .select(`
-            id,
-            title,
-            content,
-            created_at,
+            *,
             author:profiles(*),
             categories(name, slug)  
           `)
+          .eq('published', true)
           .order('created_at', {ascending: false})
           
         if (error) throw error

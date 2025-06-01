@@ -12,10 +12,10 @@ interface PostCardProps {
   post: Post
 }
 
-const PostCard = ({ post }) => {
+const PostCard = ({ post }: PostCardProps) => {
   const { theme } = useTheme();
   const isLight = theme === 'light';
-  
+  console.log(post)
   return (
     <div className="group h-full cursor-pointer">
       <div className={`h-full overflow-hidden flex flex-col transition-all duration-300 border rounded-lg ${

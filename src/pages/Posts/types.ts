@@ -29,14 +29,8 @@ export interface Post {
     content: string
     thumbnail_url: string | null
     slug: string
-    author: {
-        username: string,
-        avatar_url: string
-    },
-    category: {
-        name: string,
-        slug: string
-    },
+    author: Author,
+    category: Category,
     created_at: string
     published: boolean
     updated_at: string
