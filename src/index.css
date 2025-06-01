@@ -164,7 +164,7 @@
   /* Dark mode specific styles */
   :root.dark .cyber-card,
   :root.high-contrast .cyber-card {
-    @apply border-cyber-purple/20 bg-cyber-dark;
+    @apply border-cyber-black/50 bg-cyber-dark;
   }
 
   :root.dark .cyber-grid,
@@ -182,6 +182,4 @@
   }
   
 
-
-  /* ... keep existing code (component styles) */
 }

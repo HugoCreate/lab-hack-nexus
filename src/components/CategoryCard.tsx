@@ -75,32 +75,47 @@ const CategoryCard = ({ category }: CategoryCardProps) => {
         <div className={`
           cyber-card p-6 h-full 
           transition-all duration-300 
-          ${isEmpty ? null : "group-hover:border-cyber-blue" }`
+          ${isEmpty ? null : "group-hover:border-cyber-purple" }`
           }>
-          <div className="flex justify-between items-start">
-            <div className="bg-black/25 p-3 rounded-md">
-              <IconComponent className="h-6 w-6 text-cyber-purple-dark" />
+          <div className={`
+            flex justify-between items-start`}>
+            <div 
+              className={`
+              p-3 rounded-md
+              transition-colors
+              duration-700
+              text-primary-foreground/75
+                ${isEmpty 
+                  ? "bg-black/25 text-foreground" 
+                  : `
+                      bg-primary/10 
+                      hover:bg-primary/60
+                      hover:text-foreground/60
+                      `}
+              `}>
+              <IconComponent 
+                className={`h-6 w-6`} />
             </div>
             
             <Badge 
-              variant={isEmpty ? "outline" : "default"} 
-              className={
-                isEmpty 
-                  ? "border-cyber-black/20 text-cyber-dark/90 bg-cyber-black/40" 
-                  : "border-cyber-purple/50 text-cyber-purple/90 bg-cyber-purple-light/10 "}>
+              variant={isEmpty ? "disabled" : "primary"} >
               {isLoading ? '...' : `${postsCount} posts`}
             </Badge>
-             
+      
           </div>
           
-          <h3 className="mt-4 text-lg font-medium text-cyber-dark">
+          <h3 className={`
+            mt-4 text-lg font-bold 
+            text${isEmpty ?  '-muted' : '-foreground'}`}>
             {category.name}
           </h3>
           
-          <p className="mt-2 text-muted-foreground text-sm line-clamp-3">
+          <p className={`
+            mt-2 text-sm line-clamp-3
+            text-muted-foreground`}>
             {category.description}
           </p>
-          <div className="mt-4 flex items-center text-cyber-blue-10 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="mt-4 flex items-center justify-end text-cyber-purple/90 opacity-0 group-hover:opacity-100 transition-opacity">
           {!isEmpty && (
           <>
             <span className="text-sm">Explorar</span>

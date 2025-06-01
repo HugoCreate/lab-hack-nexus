@@ -86,6 +86,13 @@ Todos os componentes do projeto
 
 ### UI `components/ui`
 Eu não abro mais essa pasta nem me pagando.
+
+#### `ui/badge.tsx` 
+
+Um component visual de pílula com borda e cor de fundo acentuado e animado. 
+
+**Variantes:** `["primary"`, `"secondary"`, `"destructive"`, `"disabled"`
+
 #### `toast.tsx`
 
 ## Contexts
