@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Menu, X, Terminal, Shield, ChevronDown, User, LogOut, Settings, FileText, Users } from 'lucide-react';
@@ -24,9 +24,24 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [categories, setCategories] = useState([]);
 
-  React.useEffect(() => {
-    const checkAdminStatus = async () => {
+  const fetchCategories = async (limit = 3) => {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .order('name')
+      .limit(limit);
+    
+    if (error) {
+      console.error('Error fetching categories:', error);
+      throw error;
+    }
+    
+    setCategories(data)
+  };
+
+  const checkAdminStatus = async () => {
       if (!user) return;
 
       try {
@@ -42,6 +57,8 @@ const Navbar = () => {
         console.error('Error checking admin status:', error);
       }
     };
+  useEffect(() => {
+    fetchCategories(2);
 
     if (user) {
       checkAdminStatus();
@@ -56,7 +73,7 @@ const Navbar = () => {
         description: "Você foi desconectado da sua conta.",
       });
       navigate('/');
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Erro ao fazer logout",
         description: error.message,
@@ -64,14 +81,6 @@ const Navbar = () => {
       });
     }
   };
-
-  const categories = [
-    { name: 'Web App Hacking', path: '/category/web-app-hacking' },
-    { name: 'Introdução a Hacking', path: '/category/introducao-hacking' },
-    { name: 'Linux', path: '/category/linux' },
-    { name: 'Redes', path: '/category/redes' },
-    { name: 'Hardware Hacking', path: '/category/hardware-hacking' },
-  ];
 
   // Get initials for avatar fallback
   const getUserInitials = () => {

@@ -12,6 +12,22 @@ import { supabase } from '@/integrations/supabase/client';
 import { Post } from './Posts/types';
 import { useTitle } from '@/hooks/use-title';
 
+// Função auxiliar para determinar o ícone com base no slug
+const getCategoryIcon = (slug: string): 'code' | 'terminal' | 'wifi' | 'cpu' | 'fileCode' => {
+  const iconMapping: Record<string, 'code' | 'terminal' | 'wifi' | 'cpu' | 'fileCode'> = {
+    'web-app-hacking': 'code',
+    'introducao-hacking': 'terminal',
+    'linux': 'terminal',
+    'redes': 'wifi',
+    'hardware-hacking': 'cpu',
+    'mobile-hacking': 'code',
+    'forense-digital': 'fileCode',
+    'engenharia-social': 'code'
+  };
+  
+  return iconMapping[slug] || 'code';
+};
+
 // Função para buscar categorias do Supabase
 const fetchCategories = async (limit = 3) => {
   const { data, error } = await supabase
@@ -31,23 +47,6 @@ const fetchCategories = async (limit = 3) => {
     icon: getCategoryIcon(category.slug)
   }));
 };
-
-// Função auxiliar para determinar o ícone com base no slug
-const getCategoryIcon = (slug: string): 'code' | 'terminal' | 'wifi' | 'cpu' | 'fileCode' => {
-  const iconMapping: Record<string, 'code' | 'terminal' | 'wifi' | 'cpu' | 'fileCode'> = {
-    'web-app-hacking': 'code',
-    'introducao-hacking': 'terminal',
-    'linux': 'terminal',
-    'redes': 'wifi',
-    'hardware-hacking': 'cpu',
-    'mobile-hacking': 'code',
-    'forense-digital': 'fileCode',
-    'engenharia-social': 'code'
-  };
-  
-  return iconMapping[slug] || 'code';
-};
-
 // Função para buscar posts do Supabase
 const fetchPosts = async () => {
   try {
