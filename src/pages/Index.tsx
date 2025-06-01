@@ -12,6 +12,22 @@ import { supabase } from '@/integrations/supabase/client';
 import { Post } from './Posts/types';
 import { useTitle } from '@/hooks/use-title';
 
+// Função auxiliar para determinar o ícone com base no slug
+const getCategoryIcon = (slug: string): 'code' | 'terminal' | 'wifi' | 'cpu' | 'fileCode' => {
+  const iconMapping: Record<string, 'code' | 'terminal' | 'wifi' | 'cpu' | 'fileCode'> = {
+    'web-app-hacking': 'code',
+    'introducao-hacking': 'terminal',
+    'linux': 'terminal',
+    'redes': 'wifi',
+    'hardware-hacking': 'cpu',
+    'mobile-hacking': 'code',
+    'forense-digital': 'fileCode',
+    'engenharia-social': 'code'
+  };
+  
+  return iconMapping[slug] || 'code';
+};
+
 // Função para buscar categorias do Supabase
 const fetchCategories = async (limit = 3) => {
   const { data, error } = await supabase
@@ -32,20 +48,63 @@ const fetchCategories = async (limit = 3) => {
   }));
 };
 
-// Função auxiliar para determinar o ícone com base no slug
-const getCategoryIcon = (slug: string): 'code' | 'terminal' | 'wifi' | 'cpu' | 'fileCode' => {
-  const iconMapping: Record<string, 'code' | 'terminal' | 'wifi' | 'cpu' | 'fileCode'> = {
-    'web-app-hacking': 'code',
-    'introducao-hacking': 'terminal',
-    'linux': 'terminal',
-    'redes': 'wifi',
-    'hardware-hacking': 'cpu',
-    'mobile-hacking': 'code',
-    'forense-digital': 'fileCode',
-    'engenharia-social': 'code'
-  };
-  
-  return iconMapping[slug] || 'code';
+// Função para buscar posts do Supabase
+const fetchPosts = async () => {
+  try {
+    // Primeiro, buscamos os posts básicos
+    const { data: postsData, error: postsError } = await supabase
+      .from('posts')
+      .select(`
+        *,
+        categories:category_id (name, slug)
+      `)
+      .eq('published', true)
+      .order('created_at', { ascending: false });
+    
+    if (postsError) {
+      console.error('Error fetching posts:', postsError);
+      throw postsError;
+    }
+    
+    // Para cada post, buscamos informações do autor separadamente
+    const postsWithAuthors = await Promise.all(postsData.map(async (post) => {
+      // Buscar informações do autor
+      const { data: authorData } = await supabase
+        .from('profiles')
+        .select('username, avatar_url')
+        .eq('id', post.author_id)
+        .single();
+      
+      // Usar valores padrão se não encontrar o autor
+      const author = authorData || {
+        username: 'Autor desconhecido',
+        avatar_url: '/placeholder.svg'
+      };
+      
+      return {
+        id: post.id,
+        title: post.title,
+        excerpt: post.content ? post.content.substring(0, 150) + '...' : '',
+        slug: post.slug,
+        coverImage: post.thumbnail_url || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
+        category: {
+          name: post.categories?.name || 'Sem categoria',
+          slug: post.categories?.slug || ''
+        },
+        author: {
+          name: author.username,
+          avatar: author.avatar_url
+        },
+        publishedAt: new Date(post.created_at).toLocaleDateString('pt-BR'),
+        readTime: Math.ceil(post.content?.length / 1000) || 5
+      };
+    }));
+    
+    return postsWithAuthors;
+  } catch (error) {
+    console.error('Error processing posts:', error);
+    return [];
+  }
 };
 
 const Index = () => {
