@@ -93,12 +93,11 @@ const Posts = () => {
 
     // Filtro por busca textual
     try {
-      if (searchQuery) {
-        result = result.filter(post => 
-          post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          post.content.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-      }
+      //TODO: Corrigir busca por texto
+      result = result.filter(post => 
+        (post.title?.trim().toLowerCase() || '').includes(searchQuery.toLowerCase().trim()) ||
+        (post.content?.trim().toLowerCase() || '').includes(searchQuery.toLowerCase().trim())
+      );
     } catch (error) {
       console.error('Error at querying search text: ', error);
       toast({
@@ -112,7 +111,6 @@ const Posts = () => {
     try {
       // Filtro por categoria
       if (selectedSlug !== 'all') {
-        console.log(result)
         result = result.filter(post => post.categories?.slug === selectedSlug);
       } else {
         result = [...allPosts]
@@ -167,6 +165,7 @@ const Posts = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                 <Input
+                  disabled
                   placeholder="Pesquisar posts..."
                   className="pl-10 border-cyber-purple/20 focus:border-cyber-purple"
                   value={searchQuery}
