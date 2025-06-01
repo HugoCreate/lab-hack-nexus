@@ -177,11 +177,11 @@ const Index = () => {
                   Posts <span className="text-cyber-blue">Em Destaque</span>
                 </h2>
                 <p className="text-muted-foreground">
-                  Conteúdo selecionado pelos nossos especialistas
+                  Confira os conteúdo adicionados mais recentemente em nossa Wiki.
                 </p>
               </div>
               <Link to="/posts" className="mt-4 md:mt-0">
-                <Button variant="outline" className="border-cyber-blue/30">
+                <Button variant="outline" className="border-cyber-purple/30">
                   Ver todos posts <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
               </Link>
