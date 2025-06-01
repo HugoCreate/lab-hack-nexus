@@ -75,7 +75,8 @@ const CategoryCard = ({ category }: CategoryCardProps) => {
         <div className={`
           cyber-card p-6 h-full 
           transition-all duration-300 
-          ${isEmpty ? null : "group-hover:border-cyber-purple" }`
+          border-4
+          ${!isEmpty && "group-hover:border-cyber-purple" }`
           }>
           <div className={`
             flex justify-between items-start`}>
@@ -85,13 +86,16 @@ const CategoryCard = ({ category }: CategoryCardProps) => {
               transition-colors
               duration-700
               text-primary-foreground/75
-                ${isEmpty 
-                  ? "bg-black/25 text-foreground" 
-                  : `
-                      bg-primary/10 
-                      hover:bg-primary/60
-                      hover:text-foreground/60
-                      `}
+              ${isEmpty 
+              ? `
+                bg-black/25 
+                  text-secondary
+                ` 
+              : `
+                  bg-primary/10 
+                  hover:bg-primary/60
+                  hover:text-foreground/60
+                  `}
               `}>
               <IconComponent 
                 className={`h-6 w-6`} />
@@ -106,16 +110,30 @@ const CategoryCard = ({ category }: CategoryCardProps) => {
           
           <h3 className={`
             mt-4 text-lg font-bold 
-            text${isEmpty ?  '-muted' : '-foreground'}`}>
+            ${isEmpty ?  'text-foreground/30' : 'text-foreground'}
+            ${!isEmpty && 'group-hover:text-primary'}
+            transition-colors
+            `}>
             {category.name}
           </h3>
           
           <p className={`
             mt-2 text-sm line-clamp-3
-            text-muted-foreground`}>
+            ${isEmpty && 'text-cyber-purple-dark/30'}
+            ${!isEmpty && 'text-muted-foreground group-hover:text-foreground'}
+            transition-colors`}>
             {category.description}
           </p>
-          <div className="mt-4 flex items-center justify-end text-cyber-purple/90 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className={`
+            mt-4 flex items-center justify-end 
+            font-bold
+            text-cyber-purple/90 
+            opacity-0 
+            group-hover:opacity-100 
+            hover:text-cyber-purple/60
+            transition-all
+            duration-300
+            `}>
           {!isEmpty && (
           <>
             <span className="text-sm">Explorar</span>

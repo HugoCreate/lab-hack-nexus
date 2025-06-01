@@ -11,8 +11,8 @@ const badgeVariants = cva(
     px-2.5 py-0.5 
     text-xs 
     font-semibold 
-    transition-colors 
-    duration-500
+    transition-all 
+    duration-300
     focus:outline-none 
     focus:ring-2 
     focus:ring-ring 
@@ -24,19 +24,23 @@ const badgeVariants = cva(
       variant: {
         primary:`
           border-primary 
-          bg-primary/10 
+          bg-secondary 
           text-foreground/75 
           hover:bg-primary/40`,
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground/75 hover:bg-secondary/10",
+        secondary:`
+          border-transparent
+          bg-secondary
+          text-secondary-foreground/75
+          hover:bg-secondary/10
+          `,
         destructive:
           "border-transparent bg-destructive text-destructive-foreground/75 hover:bg-destructive/80",
         disabled:`
-          bg-cyber-black/50 
-          border-cyber-purple-dark/20
-          text-primary/20 
+          border-cyber-black/30
+          bg-black/20 
+          text-secondary
           hover:bg-cyber-black/30
-          hover:text-primary/30`
+          hover:text-secondary`
       },
     },
     defaultVariants: {
