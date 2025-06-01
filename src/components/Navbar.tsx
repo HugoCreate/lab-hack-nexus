@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Menu, X, Terminal, Shield, ChevronDown, User, LogOut, Settings, FileText, Users } from 'lucide-react';
@@ -24,9 +24,24 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [categories, setCategories] = useState([]);
 
-  React.useEffect(() => {
-    const checkAdminStatus = async () => {
+  const fetchCategories = async (limit = 3) => {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .order('name')
+      .limit(limit);
+    
+    if (error) {
+      console.error('Error fetching categories:', error);
+      throw error;
+    }
+    
+    setCategories(data)
+  };
+
+  const checkAdminStatus = async () => {
       if (!user) return;
 
       try {
@@ -42,6 +57,8 @@ const Navbar = () => {
         console.error('Error checking admin status:', error);
       }
     };
+  useEffect(() => {
+    fetchCategories(2);
 
     if (user) {
       checkAdminStatus();
@@ -56,7 +73,7 @@ const Navbar = () => {
         description: "Você foi desconectado da sua conta.",
       });
       navigate('/');
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Erro ao fazer logout",
         description: error.message,
@@ -64,14 +81,6 @@ const Navbar = () => {
       });
     }
   };
-
-  const categories = [
-    { name: 'Web App Hacking', path: '/category/web-app-hacking' },
-    { name: 'Introdução a Hacking', path: '/category/introducao-hacking' },
-    { name: 'Linux', path: '/category/linux' },
-    { name: 'Redes', path: '/category/redes' },
-    { name: 'Hardware Hacking', path: '/category/hardware-hacking' },
-  ];
 
   // Get initials for avatar fallback
   const getUserInitials = () => {
@@ -95,43 +104,61 @@ const Navbar = () => {
           </span>
         </Link>
 
-        {/* Desktop Navigation - Moved closer to logo */}
+        {/* Desktop Navigation*/}
         <div className="hidden md:flex md:items-center md:space-x-3 flex-grow">
-          <Link to="/" className="text-sm font-medium hover:text-cyber-purple transition-colors border border-cyber-purple/30 rounded-md px-3 py-1.5 hover:bg-cyber-purple/10 outline outline-1 outline-cyber-purple/10">
+          <Link to="/" className="
+            text-sm font-medium 
+            hover:text-cyber-purple 
+            transition-colors border 
+            border-cyber-purple/30 rounded-md px-3 py-1.5 
+            hover:bg-cyber-purple/10 
+            outline outline-1 
+            outline-cyber-purple/10">
             Home
           </Link>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center space-x-1 py-1.5 border-cyber-purple/30 hover:bg-cyber-purple/10 outline outline-1 outline-cyber-purple/10">
-                <span>Categorias</span>
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-cyber-dark border-cyber-purple/30 w-56">
-              {categories.map((category) => (
-                <DropdownMenuItem key={category.path} asChild>
-                  <Link 
-                    to={category.path} 
-                    className="flex w-full hover:bg-cyber-purple/10"
-                  >
-                    {category.name}
+          <Link 
+            to='/categories'
+            className='
+              flex flex-row
+              text-sm font-medium 
+              hover:text-cyber-purple 
+              transition-colors border 
+              border-cyber-purple/30 rounded-md px-3 py-1.5 
+              hover:bg-cyber-purple/10 
+              outline outline-1 
+              outline-cyber-purple/10'>
+            <span>Categorias</span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <ChevronDown className="flex items-center group space-x-1 rounded w-4 h-4 hover:bg-cyber-purple/10" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="bg-cyber-dark border-cyber-purple/30 w-56">
+                {categories.map((category) => (
+                  <DropdownMenuItem key={category.path} asChild>
+                    <Link 
+                      to={category.path} 
+                      className="flex w-full hover:bg-cyber-purple/10"
+                    >
+                      {category.name}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuItem asChild>
+                  <Link to="/categories" className="flex w-full text-cyber-purple">
+                    Ver todas categorias
                   </Link>
                 </DropdownMenuItem>
-              ))}
-              <DropdownMenuItem asChild>
-                <Link to="/categories" className="flex w-full text-cyber-purple">
-                  Ver todas categorias
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </Link>
+    
           <Link to="/posts" className="text-sm font-medium hover:text-cyber-purple transition-colors border border-cyber-purple/30 rounded-md px-3 py-1.5 hover:bg-cyber-purple/10 outline outline-1 outline-cyber-purple/10">
             Posts
           </Link>
           {user && (
-            <Link to="/create-post" className="text-sm font-medium hover:text-cyber-purple transition-colors border border-cyber-purple/30 rounded-md px-3 py-1.5 hover:bg-cyber-purple/10 outline outline-1 outline-cyber-purple/10">
-              Criar Post
-            </Link>
+          <Link to="/create-post" className="text-sm font-medium hover:text-cyber-purple transition-colors border border-cyber-purple/30 rounded-md px-3 py-1.5 hover:bg-cyber-purple/10 outline outline-1 outline-cyber-purple/10">
+            Criar Post
+          </Link>
           )}
         </div>
 
