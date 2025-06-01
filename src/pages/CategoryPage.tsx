@@ -51,7 +51,7 @@ const CategoryPage = () => {
     const { data, error } = await supabase
       .from('categories')
       .select('*')
-      .eq('name', slug)
+      .eq('slug', slug)
       .single()
     
     if (error) {
