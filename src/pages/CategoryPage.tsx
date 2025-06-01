@@ -7,8 +7,10 @@ import PostCard from '@/components/PostCard';
 import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Category } from './Posts/types';
+import { Category, Post } from './Posts/types';
 import { useTitle } from '@/hooks/use-title';
+import { Badge } from '@/components/ui/badge';
+import Posts from './Posts';
 
 // // Mock category data
 // const categories = {
@@ -48,7 +50,8 @@ const CategoryPage = () => {
   useTitle();
   const { slug } = useParams<{ slug: string }>();
   const [category, setCategory] = useState<Category|null>(null);
-
+  const [posts, setPosts] = useState([]) 
+  
   const fetchCategory = async () => {
     const { data, error } = await supabase
       .from('categories')
@@ -63,28 +66,39 @@ const CategoryPage = () => {
 
     setCategory(data)
   };
+
+  const fetchPosts = async () => {
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('category_id', category.id)
+
+      
+    if (error) {
+      console.log('Error fetching pages: ', error);
+      throw error;
+    }
+
+    setPosts(data)
+  }
   
-  const {isLoading, error} = useQuery({
+  const {isLoading: isLoadingCategory, error: errorLoadingCategory} = useQuery({
     queryKey: ['categories'],
     queryFn: fetchCategory,
   });
+
+  const {isLoading: isLoadingPosts, error: errorLoadingPosts} = useQuery({
+    queryKey: ['posts'],
+    queryFn: fetchPosts,
+  })
   
-  if (isLoading) {
-    return (
-      <div className='min-h-screen flex flex-col bg-background'>
-        <Navbar>
-          
-        </Navbar>
-      </div>
-    )
-  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-gro py-16">
-        <div className="container mx-auto px-4 py-16 flex-grow">
-          {isLoading && (
+        <div className="container mx-auto px-4">
+          {isLoadingCategory && (
           <div className="text-center">
               <p className='text-muted-foreground'>Carregando categoria...</p>
           </div>
@@ -102,7 +116,8 @@ const CategoryPage = () => {
             </Link>
           </div>
           ) : 
-          <div className="bg-cyber-dark py-16">
+          <div className="max-w-3x1 max-auto text-center mb-12">
+            <h2 className='text-3xl md:text-4xl font-bold mb-4 text-cyber-purple'>Categoria</h2>
             <div className="container mx-auto px-4">
               <div className="flex flex-col md:flex-row gap-8 items-center">
                 {/* TODO: Adicionar string de icone a tabela category 
@@ -114,12 +129,61 @@ const CategoryPage = () => {
                   <h1 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r bg-clip-text">
                     {category.name}
                   </h1>
-                  <p className="text-lg text-muted-foreground max-w-2xl">
-                    {category.description}
-                  </p>
+                  <div className='flex flex-row gap-2 items-baseline '>
+                    <span className="text-lg text-muted-foreground">
+                      {category.description}.
+                    </span>
+                    <Badge className='self-center'>
+                      {category.slug}
+                    </Badge>
+                  </div>  
                 </div>
               </div>
             </div>
+            <main className="container mx-auto px-4 py-16 flex-grow">
+              <div className="mb-10 flex flex-col md:flex-row justify-between items-center">
+                <h2 className="text-2xl font-bold mb-4 md:mb-0">
+                  Posts em <span className="text-cyber-purple">{category.name}</span>
+                </h2>
+                
+                <div className="flex items-center space-x-2">
+                  <Link to="/posts">
+                    <Button variant="outline" className="border-cyber-purple/30">
+                      Todos os posts
+                    </Button>
+                  </Link>
+                  <Link to="/categories">
+                    <Button variant="outline" className="border-cyber-purple/30">
+                      Categorias
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+              { isLoadingPosts && (
+              <div className="text-center">
+                  <p className='text-muted-foreground'>Carregando posts...</p>
+              </div>  
+              )}
+              {posts.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {posts.map((post) => (
+                  <PostCard key={post.id} post={post} />
+                ))}
+              </div>
+              ) : (
+              <div className="text-center py-16">
+                <h3 className="text-xl font-medium mb-2">Nenhum post encontrado</h3>
+                <p className="text-muted-foreground mb-8">
+                  Ainda não existem posts nesta categoria. Seja o primeiro a contribuir!
+                </p>
+                <Link to="/posts">
+                  <Button className="bg-cyber-purple hover:bg-cyber-purple-dark">
+                    Ver todos os posts
+                  </Button>
+                </Link>
+              </div>
+              )}
+            </main>
           </div>
           }
           
@@ -155,46 +219,7 @@ const CategoryPage = () => {
         </div>
       </div>
       
-      <main className="container mx-auto px-4 py-16 flex-grow">
-        <div className="mb-10 flex flex-col md:flex-row justify-between items-center">
-          <h2 className="text-2xl font-bold mb-4 md:mb-0">
-            Posts em <span className="text-cyber-purple">{category.name}</span>
-          </h2>
-          
-          <div className="flex items-center space-x-2">
-            <Link to="/posts">
-              <Button variant="outline" className="border-cyber-purple/30">
-                Todos os posts
-              </Button>
-            </Link>
-            <Link to="/categories">
-              <Button variant="outline" className="border-cyber-purple/30">
-                Categorias
-              </Button>
-            </Link>
-          </div>
-        </div>
-        
-        {/* {posts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {posts.map((post) => (
-              <PostCard key={post.id} post={post} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16">
-            <h3 className="text-xl font-medium mb-2">Nenhum post encontrado</h3>
-            <p className="text-muted-foreground mb-8">
-              Ainda não existem posts nesta categoria. Seja o primeiro a contribuir!
-            </p>
-            <Link to="/posts">
-              <Button className="bg-cyber-purple hover:bg-cyber-purple-dark">
-                Ver todos os posts
-              </Button>
-            </Link>
-          </div>
-        )} */}
-      </main>
+      
       
       <Footer />
     </div>
