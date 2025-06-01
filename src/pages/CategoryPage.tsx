@@ -96,14 +96,14 @@ const CategoryPage = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
-      <main className="flex-gro py-16">
+      <main className="flex-grow py-16">
         <div className="container mx-auto px-4">
           {isLoadingCategory && (
           <div className="text-center">
               <p className='text-muted-foreground'>Carregando categoria...</p>
           </div>
           )}
-          {!category ? (
+          {(!isLoadingCategory && !category) && (
           <div className="text-center py-16">
             <h1 className="text-2xl md:text-3xl font-bold mb-4">Categoria não encontrada</h1>
             <p className="text-muted-foreground mb-8">
@@ -115,33 +115,34 @@ const CategoryPage = () => {
               </Button>
             </Link>
           </div>
-          ) : 
-          <div className="max-w-3x1 max-auto text-center mb-12">
-            <h2 className='text-3xl md:text-4xl font-bold mb-4 text-cyber-purple'>Categoria</h2>
+          )}
+          {(!isLoadingCategory && category) && (
+          <div className="max-w-3x1 max-auto mb-12">
+            <h2 className='text-center md:text-left text-3xl font-bold mb-4 text-cyber-purple'>
+              Categoria
+            </h2>
             <div className="container mx-auto px-4">
-              <div className="flex flex-col md:flex-row gap-8 items-center">
                 {/* TODO: Adicionar string de icone a tabela category 
                 <div className="bg-cyber-black/50 p-6 rounded-lg border border-cyber-purple/20 backdrop-blur-sm">
                   {category.icon}
                 </div> */}
                 
                 <div className="text-center md:text-left">
-                  <h1 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r bg-clip-text">
+                  <h1 className="text-justify text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r bg-clip-text">
                     {category.name}
                   </h1>
-                  <div className='flex flex-row gap-2 items-baseline '>
-                    <span className="text-lg text-muted-foreground">
+                  <div className='flex flex-col items-center content-center'>
+                    <span className="text-lg text-muted-foreground py-4">
                       {category.description}.
                     </span>
-                    <Badge className='self-center'>
+                    <Badge className='self-end'>
                       {category.slug}
                     </Badge>
                   </div>  
                 </div>
-              </div>
             </div>
             <main className="container mx-auto px-4 py-16 flex-grow">
-              <div className="mb-10 flex flex-col md:flex-row justify-between items-center">
+              <div className="mb-2 flex flex-col md:flex-row justify-between items-center">
                 <h2 className="text-2xl font-bold mb-4 md:mb-0">
                   Posts em <span className="text-cyber-purple">{category.name}</span>
                 </h2>
@@ -164,28 +165,30 @@ const CategoryPage = () => {
                   <p className='text-muted-foreground'>Carregando posts...</p>
               </div>  
               )}
-              {posts.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              
+              { (!isLoadingPosts && posts.length > 0) && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 rounded p-4 bg-black/30">
                 {posts.map((post) => (
                   <PostCard key={post.id} post={post} />
                 ))}
               </div>
-              ) : (
-              <div className="text-center py-16">
-                <h3 className="text-xl font-medium mb-2">Nenhum post encontrado</h3>
-                <p className="text-muted-foreground mb-8">
-                  Ainda não existem posts nesta categoria. Seja o primeiro a contribuir!
-                </p>
-                <Link to="/posts">
-                  <Button className="bg-cyber-purple hover:bg-cyber-purple-dark">
-                    Ver todos os posts
-                  </Button>
-                </Link>
-              </div>
+              )} 
+              { (!isLoadingPosts && posts.length == 0) && (
+                <div className="text-center py-16">
+                  <h3 className="text-xl font-medium mb-2">Nenhum post encontrado</h3>
+                  <p className="text-muted-foreground mb-8">
+                    Ainda não existem posts nesta categoria. Seja o primeiro a contribuir!
+                  </p>
+                  <Link to="/posts">
+                    <Button className="bg-cyber-purple hover:bg-cyber-purple-dark">
+                      Ver todos os posts
+                    </Button>
+                  </Link>
+                </div>
               )}
             </main>
           </div>
-          }
+          )}
           
         </div>
       </main>

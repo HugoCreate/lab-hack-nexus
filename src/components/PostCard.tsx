@@ -17,7 +17,7 @@ const PostCard = ({ post }) => {
   const isLight = theme === 'light';
   
   return (
-    <div className="group h-full">
+    <div className="group h-full cursor-pointer">
       <div className={`h-full overflow-hidden flex flex-col transition-all duration-300 border rounded-lg ${
         isLight 
           ? 'bg-white border-gray-200 shadow-sm hover:border-primary/50 hover:shadow-md' 
