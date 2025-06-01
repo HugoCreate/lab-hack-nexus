@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Category } from './Posts/types';
+import { useTitle } from '@/hooks/use-title';
 
 // // Mock category data
 // const categories = {
@@ -44,6 +45,7 @@ import { Category } from './Posts/types';
 // };
 
 const CategoryPage = () => {
+  useTitle();
   const { slug } = useParams<{ slug: string }>();
   const [category, setCategory] = useState<Category|null>(null);
 
@@ -58,20 +60,36 @@ const CategoryPage = () => {
       console.error('Error fetching categories:', error);
       throw error;
     }
-    
+
     setCategory(data)
   };
   
-  const {isLoading, error, data: Category} = useQuery({
+  const {isLoading, error} = useQuery({
     queryKey: ['categories'],
     queryFn: fetchCategory,
   });
   
-  if (!category) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <Navbar />
+      <div className='min-h-screen flex flex-col bg-background'>
+        <Navbar>
+          
+        </Navbar>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col bg-background">
+      <Navbar />
+      <main className="flex-gro py-16">
         <div className="container mx-auto px-4 py-16 flex-grow">
+          {isLoading && (
+          <div className="text-center">
+              <p className='text-muted-foreground'>Carregando categoria...</p>
+          </div>
+          )}
+          {!category ? (
           <div className="text-center py-16">
             <h1 className="text-2xl md:text-3xl font-bold mb-4">Categoria não encontrada</h1>
             <p className="text-muted-foreground mb-8">
@@ -83,11 +101,34 @@ const CategoryPage = () => {
               </Button>
             </Link>
           </div>
+          ) : 
+          <div className="bg-cyber-dark py-16">
+            <div className="container mx-auto px-4">
+              <div className="flex flex-col md:flex-row gap-8 items-center">
+                {/* TODO: Adicionar string de icone a tabela category 
+                <div className="bg-cyber-black/50 p-6 rounded-lg border border-cyber-purple/20 backdrop-blur-sm">
+                  {category.icon}
+                </div> */}
+                
+                <div className="text-center md:text-left">
+                  <h1 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r bg-clip-text">
+                    {category.name}
+                  </h1>
+                  <p className="text-lg text-muted-foreground max-w-2xl">
+                    {category.description}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          }
+          
         </div>
-        <Footer />
-      </div>
-    );
-  }
+      </main>
+      <Footer />
+    </div>
+  );
+  
   
   // const posts = categoryPosts[slug as keyof typeof categoryPosts] || [];
   

@@ -10,6 +10,7 @@ import { ChevronRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Post } from './Posts/types';
+import { useTitle } from '@/hooks/use-title';
 
 // Função para buscar categorias do Supabase
 const fetchCategories = async (limit = 3) => {
@@ -107,9 +108,8 @@ const fetchPosts = async () => {
 };
 
 const Index = () => {
-  const [allPosts, setAllPosts] = useState<Post[]>([])
-
-  
+  useTitle();
+  const [allPosts, setAllPosts] = useState<Post[]>([])  
 
   // Buscar categorias do Supabase
   const { data: categories = [], isLoading: loadingCategories } = useQuery({

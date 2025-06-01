@@ -7,6 +7,7 @@ import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useTitle } from '@/hooks/use-title';
 
 // Dicionário de Icones para cada Slug
 // TODO: Colocar os icone-slug no banco de dados
@@ -42,6 +43,7 @@ const fetchCategories = async () => {
 
 
 const Categories = () => {
+  useTitle();
   const [searchQuery, setSearchQuery] = React.useState('');
   
   // Buscar categorias do Supabase
