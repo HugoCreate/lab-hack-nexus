@@ -135,7 +135,8 @@ const CategoryPage = () => {
                     <span className="text-lg text-muted-foreground py-4">
                       {category.description}.
                     </span>
-                    <Badge className='self-end'>
+                    <Badge className='self-end cursor-default'>
+                      {/* TODO: Adicionar cor customizada a badge variant custom */}
                       {category.slug}
                     </Badge>
                   </div>  
