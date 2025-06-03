@@ -14,7 +14,7 @@ import (
 
 // ListCategories returns all categories
 func ListCategories(c *gin.Context) {
-	data, err := database.Select("categories", "*", "order=name", false)
+	data, err := database.Select("categories", "*", "order=name.asc", false)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
 			Error:   "database_error",

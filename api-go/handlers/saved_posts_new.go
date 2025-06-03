@@ -130,3 +130,13 @@ func ListSavedPosts(c *gin.Context) {
 
 	c.JSON(http.StatusOK, savedPosts)
 }
+
+// SavePostNew is a new function that calls the existing SavePost
+func SavePostNew(c *gin.Context) {
+	SavePost(c)
+}
+
+// UnsavePostNew is a new function that calls the existing UnsavePost
+func UnsavePostNew(c *gin.Context) {
+	UnsavePost(c)
+}

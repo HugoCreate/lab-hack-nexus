@@ -78,9 +78,8 @@ func main() {
 		profiles.GET("/:id", handlers.GetProfile)                                    // Public
 		profiles.PUT("/:id", middleware.AuthMiddleware(), handlers.UpdateProfile)    // Protected (own profile only)
 	}
-
 	// Saved posts routes
-	r.GET("/saved-posts", middleware.AuthMiddleware(), handlers.GetSavedPosts) // Protected
+	r.GET("/saved-posts", middleware.AuthMiddleware(), handlers.ListSavedPosts) // Protected
 
 	// Website content routes
 	content := r.Group("/website-content")
